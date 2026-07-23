@@ -60,13 +60,23 @@ h1{margin:8px 0 6px;font-size:clamp(26px,3.6vw,40px);letter-spacing:.01em;font-w
 }
 .meta-pill b{color:#ffd98a;font-weight:700}
 
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:-28px 0 26px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin:26px 0 28px}
 .stat{
   background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
-  padding:14px 16px; box-shadow:var(--shadow);
+  padding:16px 18px; box-shadow:var(--shadow);
+  position:relative; overflow:hidden;
+  display:flex; align-items:center; gap:12px;
+  transition:transform .12s, box-shadow .12s;
 }
-.stat .n{font-size:26px;font-weight:700;color:var(--accent)}
-.stat .l{font-size:12.5px;color:var(--ink-soft)}
+.stat:hover{transform:translateY(-2px); box-shadow:0 6px 18px rgba(120,40,10,.14), 0 1px 2px rgba(120,40,10,.08)}
+.stat::before{
+  content:""; position:absolute; left:0; top:0; bottom:0; width:4px;
+  background:linear-gradient(180deg, var(--accent), var(--gold));
+}
+.stat .ic{font-size:22px; line-height:1; flex:none}
+.stat .txt{min-width:0}
+.stat .n{font-size:24px;font-weight:800;color:var(--accent); line-height:1.15; white-space:nowrap}
+.stat .l{font-size:12px;color:var(--ink-soft); margin-top:2px}
 
 .controls{
   position:sticky; top:0; z-index:40; background:var(--sand);
@@ -495,10 +505,10 @@ function renderStats(){
   const people = new Set();
   DATA.forEach(d=> d.r.split(",").forEach(x=> people.add(x.trim())));
   el.innerHTML = `
-    <div class="stat"><div class="n">${DATA.length}</div><div class="l">Нийт үйл ажиллагаа</div></div>
-    <div class="stat"><div class="n">${SECTIONS.length}</div><div class="l">Ажлын хэсэг</div></div>
-    <div class="stat"><div class="n">~${people.size}</div><div class="l">Хариуцсан хүн/байгууллага</div></div>
-    <div class="stat"><div class="n">08.12–16</div><div class="l">Үндсэн фестивалийн өдрүүд</div></div>
+    <div class="stat"><div class="ic">🎪</div><div class="txt"><div class="n">${DATA.length}</div><div class="l">Нийт үйл ажиллагаа</div></div></div>
+    <div class="stat"><div class="ic">🧩</div><div class="txt"><div class="n">${SECTIONS.length}</div><div class="l">Ажлын хэсэг</div></div></div>
+    <div class="stat"><div class="ic">🤝</div><div class="txt"><div class="n">~${people.size}</div><div class="l">Хариуцсан хүн/байгууллага</div></div></div>
+    <div class="stat"><div class="ic">🔥</div><div class="txt"><div class="n">08.12–16</div><div class="l">Үндсэн фестивалийн өдрүүд</div></div></div>
   `;
 }
 
