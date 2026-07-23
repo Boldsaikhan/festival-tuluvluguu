@@ -5,20 +5,23 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>"Тэнгэрийн хутагт" фестиваль — Календарчилсан төлөвлөгөө</title>
 <meta name="description" content="Тэнгэрийн хутагт-2026 аялал жуулчлалын фестивалийн зохион байгуулах ажлын хэсгүүдийн календарчилсан төлөвлөгөө">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 :root{
-  --sand:#f6efe3; --sand-2:#efe3cd; --ink:#2a2117; --ink-soft:#6b5f4e;
-  --card:#fffdf8; --line:#e4d7bd; --accent:#c76b2e; --accent-2:#8a3ea0;
-  --gold:#c99a2e; --night:#2c2149; --good:#2f7a4f; --danger:#b23b3b;
-  --radius:14px; --shadow:0 2px 10px rgba(60,40,10,.08), 0 1px 2px rgba(60,40,10,.06);
-  --weekend:#fbe9d8; --today:#ffe2a8; --main-event:#f4d9c4;
+  --sand:#fbeee1; --sand-2:#f6dcc0; --ink:#2b1710; --ink-soft:#83614a;
+  --card:#fffaf3; --line:#f0dcc0; --accent:#e6431f; --accent-2:#f4821f;
+  --gold:#f0a83c; --night:#7a1810; --good:#2f7a4f; --danger:#8a2340;
+  --radius:14px; --shadow:0 2px 10px rgba(120,40,10,.10), 0 1px 2px rgba(120,40,10,.07);
+  --weekend:#fbe0c8; --today:#ffd9a0; --main-event:#f7c5a0;
 }
 @media (prefers-color-scheme: dark){
   :root{
-    --sand:#171310; --sand-2:#211a13; --ink:#f1e9db; --ink-soft:#c9bba1;
-    --card:#1f1912; --line:#42352472; --accent:#e08a4a; --accent-2:#c98adf;
-    --gold:#e0b64c; --night:#a6a0ff; --good:#63c98a; --danger:#e07a7a;
-    --weekend:#2a2114; --today:#3a2a10; --main-event:#3a2818;
+    --sand:#1c130d; --sand-2:#271a10; --ink:#f7ead9; --ink-soft:#d3ab8b;
+    --card:#241809; --line:#4a2f1872; --accent:#f4703a; --accent-2:#ffab5c;
+    --gold:#f4b855; --night:#e35b2c; --good:#63c98a; --danger:#e0708f;
+    --weekend:#33210f; --today:#3d2a0e; --main-event:#432712;
   }
 }
 *{box-sizing:border-box}
@@ -26,29 +29,36 @@ html,body{margin:0;padding:0}
 body{
   background:linear-gradient(180deg,var(--sand),var(--sand-2) 600px);
   color:var(--ink);
-  font-family:"Segoe UI",-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
+  font-family:"Rubik","Segoe UI",-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
   line-height:1.45;
 }
 .wrap{max-width:1280px;margin:0 auto;padding:0 20px 60px}
 header.top{
-  padding:34px 20px 26px;
+  padding:40px 20px 30px;
+  position:relative; overflow:hidden;
   background:
-    radial-gradient(1200px 400px at 20% -30%, rgba(199,107,46,.25), transparent 60%),
-    radial-gradient(900px 400px at 90% -10%, rgba(138,62,160,.22), transparent 60%),
-    var(--night);
-  color:#f6efe3;
+    radial-gradient(1100px 620px at 50% -25%, #ffb15c 0%, #f4711f 38%, transparent 70%),
+    radial-gradient(1400px 900px at 15% 90%, rgba(122,24,16,.9), transparent 60%),
+    linear-gradient(165deg, #e8461f 0%, #d32e15 45%, #8f1a12 100%);
+  color:#fdf1e2;
+  box-shadow:inset 0 -1px 0 rgba(0,0,0,.15);
 }
-header.top .wrap{padding:0}
-.eyebrow{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);font-weight:600}
-h1{margin:6px 0 4px;font-size:clamp(24px,3.4vw,38px);letter-spacing:.01em}
-.sub{color:#d9cdea;font-size:14.5px;max-width:820px}
+header.top::before{
+  content:""; position:absolute; inset:0; pointer-events:none;
+  background:radial-gradient(700px 700px at 88% -10%, rgba(255,255,255,.10), transparent 60%);
+}
+header.top .wrap{padding:0; position:relative}
+.eyebrow{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:#ffd9a8;font-weight:700}
+h1{margin:8px 0 6px;font-size:clamp(26px,3.6vw,40px);letter-spacing:.01em;font-weight:800;
+  text-shadow:0 2px 10px rgba(0,0,0,.15)}
+.sub{color:#fce3cc;font-size:14.5px;max-width:820px}
 .meta-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
 .meta-pill{
-  background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.18);
-  border-radius:999px; padding:7px 14px; font-size:13px; color:#f3ecff;
-  display:flex; align-items:center; gap:6px;
+  background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.24);
+  border-radius:999px; padding:7px 14px; font-size:13px; color:#fdf1e2;
+  display:flex; align-items:center; gap:6px; backdrop-filter:blur(2px);
 }
-.meta-pill b{color:var(--gold);font-weight:700}
+.meta-pill b{color:#ffd98a;font-weight:700}
 
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:-28px 0 26px}
 .stat{
@@ -265,9 +275,9 @@ const SECTIONS = [
  {id:15, name:"Төсөв, тооцоо, тасалбар борлуулалт"},
  {id:16, name:"Гүйцэтгэлийн хяналт"},
 ];
-// warm desert / night-sky palette, one hue per section
-const PALETTE = ["#c76b2e","#8a3ea0","#2c6e8a","#b23b3b","#5a7d3a","#c99a2e",
-"#3a5a9a","#a35a8a","#4a8a6e","#9a5a2e","#2c2149","#7a3a9a","#2e8a8a","#a13a5a","#6a6a2e","#4a4a8a"];
+// fire / ember palette, one hue per section — matches festival brand
+const PALETTE = ["#e6431f","#f4821f","#c2410c","#eab308","#b91c1c","#dc2626",
+"#ea580c","#d97706","#9a3412","#be123c","#7c2d12","#f59e0b","#991b1b","#c2185b","#8a5a1c","#a6350e"];
 const sectionColor = id => PALETTE[(id-1)%PALETTE.length];
 const sectionName = id => (SECTIONS.find(s=>s.id===id)||{}).name || "";
 
