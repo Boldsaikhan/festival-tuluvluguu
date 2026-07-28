@@ -37,10 +37,12 @@ body{
 }
 .wrap{max-width:1280px;margin:0 auto;padding:0 20px 60px}
 header.top{
-  padding:14px 20px;
+  height:62px; padding:0 20px;
   background:linear-gradient(90deg, #14328f 0%, #1e49b6 100%);
   color:#ffffff;
   display:flex; align-items:center;
+  position:sticky; top:0; z-index:50;
+  box-shadow:0 1px 4px rgba(10,20,50,.25);
 }
 header.top .wrap{padding:0; display:flex; align-items:center; gap:14px; width:100%}
 .brand-badge{
@@ -82,7 +84,7 @@ h1{margin:1px 0 0;font-size:16.5px;letter-spacing:.005em;font-weight:700; color:
 .stat .l{font-size:11.5px;color:var(--ink-soft); margin-top:1px; white-space:nowrap}
 
 .controls{
-  position:sticky; top:0; z-index:40; background:var(--card);
+  position:sticky; top:62px; z-index:40; background:var(--card);
   padding:10px 12px; border:1px solid var(--line); border-radius:8px; margin-bottom:16px;
   display:flex; flex-wrap:wrap; gap:10px; align-items:center;
   box-shadow:var(--shadow);
