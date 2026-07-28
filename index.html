@@ -68,20 +68,20 @@ h1{margin:1px 0 0;font-size:16.5px;letter-spacing:.005em;font-weight:700; color:
 }
 .meta-pill b{color:var(--accent);font-weight:600}
 
-.stats{display:flex; flex-wrap:wrap; gap:10px; margin:16px 0 18px}
+.stats{display:flex; flex-wrap:nowrap; gap:8px; margin:16px 0 18px; overflow-x:auto; padding-bottom:2px}
 .stat{
   background:var(--card); border:1px solid var(--line); border-radius:8px;
-  padding:10px 16px; box-shadow:var(--shadow);
-  display:flex; align-items:center; gap:10px;
+  padding:9px 12px; box-shadow:var(--shadow);
+  display:flex; align-items:center; gap:8px;
   cursor:pointer; transition:border-color .12s, box-shadow .12s;
-  min-width:140px;
+  flex:1 1 0; min-width:0; white-space:nowrap;
 }
 .stat:hover{border-color:var(--accent-2); box-shadow:0 2px 8px rgba(20,30,60,.12)}
 .stat.active{border-color:var(--accent); box-shadow:0 0 0 1px var(--accent) inset}
-.stat .ic{font-size:26px; line-height:1; flex:none}
-.stat .txt{min-width:0}
+.stat .ic{font-size:22px; line-height:1; flex:none}
+.stat .txt{min-width:0; overflow:hidden}
 .stat .n{font-size:19px;font-weight:700;color:var(--ink); line-height:1.2; white-space:nowrap}
-.stat .l{font-size:11.5px;color:var(--ink-soft); margin-top:1px; white-space:nowrap}
+.stat .l{font-size:11.5px;color:var(--ink-soft); margin-top:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
 
 .controls{
   position:sticky; top:62px; z-index:40; background:var(--card);
