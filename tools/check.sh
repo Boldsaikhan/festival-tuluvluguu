@@ -38,8 +38,11 @@ if node - "$FILE" <<'JS'
 const fs = require("fs");
 const html = fs.readFileSync(process.argv[2], "utf8");
 const rawMatch = html.match(/const RAW = (\[[\s\S]*?\n\]);/);
+const secMatch = html.match(/const SECTIONS = (\[[\s\S]*?\n\]);/);
 if (!rawMatch) { console.log("FAIL: RAW массив олдсонгүй"); process.exit(1); }
+if (!secMatch) { console.log("FAIL: SECTIONS массив олдсонгүй"); process.exit(1); }
 const RAW = eval(rawMatch[1]);
+const SECTIONS = eval(secMatch[1]);
 const YEAR = 2026;
 function parsePeriod(str){
   const m = [...str.matchAll(/(\d{1,2})\.(\d{1,3})/g)];
@@ -53,7 +56,7 @@ let bad = 0;
 RAW.forEach((r,i)=>{
   const p = parsePeriod(r[2]);
   if(!p.start || isNaN(p.start) || isNaN(p.end)) { console.log("BAD DATE, row", i+1, r[2]); bad++; }
-  if(!(r[0]>=1 && r[0]<=16)) { console.log("BAD SECTION id, row", i+1, r[0]); bad++; }
+  if(!(r[0]>=1 && r[0]<=SECTIONS.length)) { console.log("BAD SECTION id, row", i+1, r[0]); bad++; }
 });
 console.log(`Нийт мөр: ${RAW.length}, алдаатай: ${bad}`);
 process.exit(bad ? 1 : 0);
