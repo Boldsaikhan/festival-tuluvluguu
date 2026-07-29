@@ -128,12 +128,12 @@ section.view.active{display:block}
 
 /* ---------- List view ---------- */
 .list-table-wrap{overflow-x:auto; border:1px solid var(--line); border-radius:var(--radius); background:var(--card); box-shadow:var(--shadow)}
-table.list{width:100%; border-collapse:collapse; font-size:12.5px; min-width:1250px}
+table.list{width:100%; border-collapse:collapse; font-size:12.5px; min-width:1080px}
 table.list th{
-  text-align:left; background:var(--sand-2); padding:8px 12px; font-size:11.5px;
+  text-align:center; background:var(--sand-2); padding:8px 12px; font-size:11.5px;
   font-weight:600; color:var(--ink-soft); position:sticky; top:0; border-bottom:1px solid var(--line);
 }
-table.list td{padding:7px 12px; border-top:1px solid var(--line); vertical-align:top}
+table.list td{padding:7px 12px; border-top:1px solid var(--line); vertical-align:middle; text-align:center}
 table.list tbody tr:nth-child(even) td{background:var(--sand)}
 table.list tr.urgent td{background:var(--urgent-row)}
 table.list tr:hover td{background:var(--main-event)}
@@ -141,8 +141,8 @@ table.list tr:hover td{background:var(--main-event)}
 .period-cell{white-space:nowrap; font-variant-numeric:tabular-nums; font-weight:600; color:var(--accent)}
 .resp-cell{white-space:nowrap}
 .ctrl-cell{white-space:nowrap}
-.act-cell{min-width:280px}
-.note-cell{color:var(--ink-soft); font-size:12px; max-width:260px}
+.act-cell{min-width:250px}
+.note-cell{color:var(--ink-soft); font-size:12px; max-width:200px}
 
 /* ---------- Засварлагдах нүднүүд ---------- */
 table.list td.edit{cursor:text; border-radius:4px}
@@ -151,7 +151,7 @@ table.list td.edit:focus{outline:2px solid var(--accent); outline-offset:-2px; b
 table.list td.edit:empty::before{content:"—"; color:#aeb6c6}
 .cell-date{
   font:inherit; font-size:12px; color:var(--ink); background:transparent;
-  border:1px solid transparent; border-radius:4px; padding:2px 4px; width:132px;
+  border:1px solid transparent; border-radius:4px; padding:2px 4px; width:132px; text-align:center;
 }
 .cell-date:hover{border-color:var(--accent-2)}
 .cell-date:focus{outline:none; border-color:var(--accent); background:var(--card)}
@@ -163,14 +163,14 @@ table.list td.edit:empty::before{content:"—"; color:#aeb6c6}
 .dirty-dot{display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--accent); margin-left:5px; vertical-align:middle}
 
 /* ---------- Хэрэгжилт ---------- */
-.prog-cell{min-width:170px; width:170px}
-.prog{display:flex; align-items:center; gap:6px; min-width:150px}
+.prog-cell{min-width:155px; width:155px}
+.prog{display:flex; align-items:center; justify-content:center; gap:6px; min-width:150px}
 .prog .pct{font-size:11px; color:var(--ink-soft)}
 .prog-bar{flex:1; height:7px; border-radius:5px; background:var(--sand-2); border:1px solid var(--line); overflow:hidden}
 .prog-fill{height:100%; background:var(--accent); border-radius:5px; transition:width .15s}
 .prog-fill.done{background:#0e8f74}
 .prog-fill.late{background:#d9534f}
-.prog-num{font-size:11.5px; font-weight:700; font-variant-numeric:tabular-nums; width:38px; text-align:right;
+.prog-num{font-size:11.5px; font-weight:700; font-variant-numeric:tabular-nums; width:38px; text-align:center;
   border:1px solid transparent; border-radius:4px; background:transparent; color:var(--ink); padding:1px 2px}
 .prog-num:hover{border-color:var(--accent-2)}
 .prog-num:focus{outline:none; border-color:var(--accent); background:var(--card)}
@@ -346,7 +346,7 @@ a{color:var(--accent)}
     <div class="list-table-wrap">
       <table class="list">
         <thead><tr>
-          <th>№</th><th>Огноо</th><th>Эх сурвалж</th><th class="act-cell">Үүрэг, чиглэл</th>
+          <th>№</th><th>Огноо</th><th class="act-cell">Үүрэг, чиглэл</th>
           <th>Хариуцагч</th><th class="ctrl-cell">Хяналт тавих</th><th class="ctrl-cell">Гүйцэтгэх хугацаа</th>
           <th class="prog-cell">Хэрэгжилт</th><th class="note-cell">Тайлбар</th>
         </tr></thead>
@@ -752,7 +752,6 @@ function renderList(){
     <tr class="${hasDue(it) ? 'urgent' : ''}">
       <td>${it.id}${it.edited?'<span class="dirty-dot" title="Засварласан"></span>':''}</td>
       <td class="period-cell">${it.p}</td>
-      <td><span class="tag" style="background:${sectionColor(it.sec)}">${it.sec}</span></td>
       <td class="act-cell">${escapeHtml(it.t)}</td>
       <td class="resp-cell edit" contenteditable="true" data-id="${it.id}" data-f="r">${escapeHtml(it.r)}</td>
       <td class="ctrl-cell edit" contenteditable="true" data-id="${it.id}" data-f="c">${escapeHtml(it.c)}</td>
