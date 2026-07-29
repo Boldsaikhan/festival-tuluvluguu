@@ -128,7 +128,7 @@ section.view.active{display:block}
 
 /* ---------- List view ---------- */
 .list-table-wrap{overflow-x:auto; border:1px solid var(--line); border-radius:var(--radius); background:var(--card); box-shadow:var(--shadow)}
-table.list{width:100%; border-collapse:collapse; font-size:12.5px; min-width:1150px}
+table.list{width:100%; border-collapse:collapse; font-size:12.5px; min-width:1250px}
 table.list th{
   text-align:left; background:var(--sand-2); padding:8px 12px; font-size:11.5px;
   font-weight:600; color:var(--ink-soft); position:sticky; top:0; border-bottom:1px solid var(--line);
@@ -140,6 +140,7 @@ table.list tr:hover td{background:var(--main-event)}
 .tag{display:inline-block; padding:2px 8px; border-radius:4px; font-size:10.5px; font-weight:600; color:#fff; white-space:nowrap}
 .period-cell{white-space:nowrap; font-variant-numeric:tabular-nums; font-weight:600; color:var(--accent)}
 .resp-cell{white-space:nowrap}
+.ctrl-cell{white-space:nowrap}
 .act-cell{min-width:280px}
 .note-cell{color:var(--ink-soft); font-size:12px; max-width:260px}
 
@@ -346,7 +347,7 @@ a{color:var(--accent)}
       <table class="list">
         <thead><tr>
           <th>№</th><th>Огноо</th><th>Эх сурвалж</th><th class="act-cell">Үүрэг, чиглэл</th>
-          <th>Хариуцагч</th><th>Хяналт тавих</th><th>Гүйцэтгэх хугацаа</th>
+          <th>Хариуцагч</th><th class="ctrl-cell">Хяналт тавих</th><th class="ctrl-cell">Гүйцэтгэх хугацаа</th>
           <th class="prog-cell">Хэрэгжилт</th><th class="note-cell">Тайлбар</th>
         </tr></thead>
         <tbody id="listBody"></tbody>
@@ -754,8 +755,8 @@ function renderList(){
       <td><span class="tag" style="background:${sectionColor(it.sec)}">${it.sec}</span></td>
       <td class="act-cell">${escapeHtml(it.t)}</td>
       <td class="resp-cell edit" contenteditable="true" data-id="${it.id}" data-f="r">${escapeHtml(it.r)}</td>
-      <td class="edit" contenteditable="true" data-id="${it.id}" data-f="c">${escapeHtml(it.c)}</td>
-      <td><input class="cell-date" type="date" value="${toISO(it.end)}" data-id="${it.id}" title="Хийж гүйцэтгэх эцсийн хугацаа"></td>
+      <td class="ctrl-cell edit" contenteditable="true" data-id="${it.id}" data-f="c">${escapeHtml(it.c)}</td>
+      <td class="ctrl-cell"><input class="cell-date" type="date" value="${toISO(it.end)}" data-id="${it.id}" title="Хийж гүйцэтгэх эцсийн хугацаа"></td>
       <td class="prog-cell">${progBar(it, true)}<div style="margin-top:4px"><span class="st ${statusOf(it).k}">${statusOf(it).l}</span></div></td>
       <td class="note-cell edit" contenteditable="true" data-id="${it.id}" data-f="n">${escapeHtml(it.n)}</td>
     </tr>`).join("");
