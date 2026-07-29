@@ -53,19 +53,24 @@ header.top .wrap{padding:0; display:flex; align-items:center; gap:14px; width:10
 .eyebrow{font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:#c9d8ff;font-weight:600}
 h1{margin:1px 0 0;font-size:16.5px;letter-spacing:.005em;font-weight:700; color:#fff}
 
-/* Эх сурвалжийн сонголт — хуудсын хамгийн дээд талд, бүх сонголт нээлттэй харагдана */
-.srcbar{display:flex; flex-wrap:wrap; gap:8px; margin:16px 0 0}
-.srcchip{
-  background:var(--card); border:1px solid var(--line); border-radius:8px;
-  padding:7px 13px; font-size:12.5px; color:var(--ink-soft); cursor:pointer;
-  display:flex; align-items:center; gap:7px; box-shadow:var(--shadow);
-  transition:border-color .12s, color .12s;
+/* Эх сурвалжийн цэс — header-ийн доор, нэг мөрөнд, tab маягийн навигаци */
+.srcnav{background:var(--card); border-bottom:1px solid var(--line); position:sticky; top:62px; z-index:45}
+.srcnav-inner{
+  max-width:1280px; margin:0 auto; padding:0 20px;
+  display:flex; gap:2px; overflow-x:auto; scrollbar-width:none;
 }
-.srcchip:hover{border-color:var(--accent-2)}
-.srcchip.active{border-color:var(--accent); color:var(--ink); font-weight:600; box-shadow:0 0 0 1px var(--accent) inset}
+.srcnav-inner::-webkit-scrollbar{display:none}
+.srcchip{
+  background:transparent; border:0; border-bottom:2px solid transparent;
+  padding:13px 14px 11px; font-size:13px; color:var(--ink-soft); cursor:pointer;
+  display:flex; align-items:center; gap:8px; white-space:nowrap;
+  transition:color .12s, border-color .12s;
+}
+.srcchip:hover{color:var(--ink); border-bottom-color:var(--line)}
+.srcchip.active{color:var(--accent); font-weight:600; border-bottom-color:var(--accent)}
 .srcchip .dot{width:9px; height:9px; border-radius:50%; flex:none}
 .srcchip .dot.all{background:linear-gradient(135deg,#1e49b6 50%,#0e8f74 50%)}
-.srcchip .c{font-weight:700; color:var(--ink); font-size:11.5px; background:var(--sand-2); border-radius:20px; padding:1px 7px}
+.srcchip .c{font-weight:700; font-size:11px; background:var(--sand-2); color:var(--ink-soft); border-radius:20px; padding:1px 7px}
 .srcchip.active .c{background:var(--main-event); color:var(--accent)}
 
 .stats{display:flex; flex-wrap:nowrap; gap:8px; margin:16px 0 18px; overflow-x:auto; padding-bottom:2px}
@@ -97,7 +102,7 @@ h1{margin:1px 0 0;font-size:16.5px;letter-spacing:.005em;font-weight:700; color:
 .subchip.active .c{color:var(--accent)}
 
 .controls{
-  position:sticky; top:62px; z-index:40; background:var(--card);
+  position:sticky; top:108px; z-index:40; background:var(--card);
   padding:10px 12px; border:1px solid var(--line); border-radius:8px; margin-bottom:16px;
   display:flex; flex-wrap:wrap; gap:10px; align-items:center;
   box-shadow:var(--shadow);
@@ -288,8 +293,9 @@ a{color:var(--accent)}
   </div>
 </header>
 
+<nav class="srcnav"><div class="srcnav-inner" id="srcBar"></div></nav>
+
 <div class="wrap">
-  <div class="srcbar" id="srcBar"></div>
   <div class="stats" id="stats"></div>
   <div class="substats" id="substats"></div>
 
