@@ -68,6 +68,21 @@ h1{margin:1px 0 0;font-size:16.5px;letter-spacing:.005em;font-weight:700; color:
 }
 .meta-pill b{color:var(--accent);font-weight:600}
 
+/* Эх сурвалжийн сонголт — хуудсын хамгийн дээд талд, бүх сонголт нээлттэй харагдана */
+.srcbar{display:flex; flex-wrap:wrap; gap:8px; margin:16px 0 0}
+.srcchip{
+  background:var(--card); border:1px solid var(--line); border-radius:8px;
+  padding:7px 13px; font-size:12.5px; color:var(--ink-soft); cursor:pointer;
+  display:flex; align-items:center; gap:7px; box-shadow:var(--shadow);
+  transition:border-color .12s, color .12s;
+}
+.srcchip:hover{border-color:var(--accent-2)}
+.srcchip.active{border-color:var(--accent); color:var(--ink); font-weight:600; box-shadow:0 0 0 1px var(--accent) inset}
+.srcchip .dot{width:9px; height:9px; border-radius:50%; flex:none}
+.srcchip .dot.all{background:linear-gradient(135deg,#1e49b6 50%,#0e8f74 50%)}
+.srcchip .c{font-weight:700; color:var(--ink); font-size:11.5px; background:var(--sand-2); border-radius:20px; padding:1px 7px}
+.srcchip.active .c{background:var(--main-event); color:var(--accent)}
+
 .stats{display:flex; flex-wrap:nowrap; gap:8px; margin:16px 0 18px; overflow-x:auto; padding-bottom:2px}
 .stat{
   background:var(--card); border:1px solid var(--line); border-radius:8px;
@@ -302,12 +317,12 @@ a{color:var(--accent)}
 </div>
 
 <div class="wrap">
+  <div class="srcbar" id="srcBar"></div>
   <div class="stats" id="stats"></div>
   <div class="substats" id="substats"></div>
 
   <div class="controls">
     <input type="search" id="search" placeholder="Хайх… (үүрэг чиглэл, хариуцагч, байгууллага)">
-    <select id="sectionFilter"><option value="">Бүх эх сурвалж</option></select>
     <div class="viewtoggle">
       <button data-view="list" class="active">📋 Жагсаалт</button>
       <button data-view="cal">📅 Хуанли</button>
@@ -633,14 +648,20 @@ function renderSubStats(){
   }));
 }
 
-// ---------- section select ----------
-function renderSectionFilter(){
-  const sel = document.getElementById("sectionFilter");
-  SECTIONS.forEach(s=>{
-    const o = document.createElement("option");
-    o.value = s.id; o.textContent = `${s.id}. ${s.name}`;
-    sel.appendChild(o);
-  });
+// ---------- Эх сурвалжийн сонголт (хуудсын хамгийн дээд талд, чип хэлбэрээр) ----------
+function renderSourceBar(){
+  const el = document.getElementById("srcBar");
+  const chips = [{v:"", name:"Бүх эх сурвалж", color:"", n:DATA.length}]
+    .concat(SECTIONS.map(s=>({v:String(s.id), name:s.name, color:sectionColor(s.id), n:DATA.filter(d=>d.sec===s.id).length})));
+  el.innerHTML = chips.map(c=>`
+    <div class="srcchip ${currentFilter.sec===c.v?'active':''}" data-v="${escapeAttr(c.v)}">
+      ${c.color?`<span class="dot" style="background:${c.color}"></span>`:'<span class="dot all"></span>'}
+      ${escapeHtml(c.name)} <span class="c">${c.n}</span>
+    </div>`).join("");
+  el.querySelectorAll(".srcchip").forEach(ch=> ch.addEventListener("click", ()=>{
+    currentFilter.sec = ch.dataset.v;
+    renderSourceBar(); renderStats(); renderSubStats(); renderAll();
+  }));
 }
 
 // ---------- Calendar view ----------
@@ -920,7 +941,6 @@ function renderAll(){
 }
 
 document.getElementById("search").addEventListener("input", e=>{ currentFilter.q = e.target.value; renderAll(); });
-document.getElementById("sectionFilter").addEventListener("change", e=>{ currentFilter.sec = e.target.value; renderAll(); });
 
 document.getElementById("resetEdits").addEventListener("click", ()=>{
   if(!Object.keys(OVERRIDES).length){ alert("Засвар хийгээгүй байна."); return; }
@@ -930,7 +950,7 @@ document.getElementById("resetEdits").addEventListener("click", ()=>{
 applyOverrides();
 renderStats();
 renderSubStats();
-renderSectionFilter();
+renderSourceBar();
 renderAll();
 document.getElementById("genDate").textContent = "Үүсгэсэн: " + new Date().toLocaleDateString("mn-MN");
 
