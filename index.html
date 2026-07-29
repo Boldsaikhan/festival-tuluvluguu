@@ -83,6 +83,19 @@ h1{margin:1px 0 0;font-size:16.5px;letter-spacing:.005em;font-weight:700; color:
 .stat .n{font-size:19px;font-weight:700;color:var(--ink); line-height:1.2; white-space:nowrap}
 .stat .l{font-size:11.5px;color:var(--ink-soft); margin-top:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
 
+/* Төлөв картыг дарахад нээгдэх дэд шүүлтүүрийн мөр (хэлтэс / хариуцагч) */
+.substats{display:flex; flex-wrap:wrap; gap:6px; margin:-8px 0 18px}
+.substats:empty{display:none; margin:0}
+.subchip{
+  background:var(--card); border:1px solid var(--line); border-radius:20px;
+  padding:4px 11px; font-size:12px; color:var(--ink-soft); cursor:pointer;
+  display:flex; align-items:center; gap:6px; transition:border-color .12s, color .12s;
+}
+.subchip:hover{border-color:var(--accent-2)}
+.subchip.active{border-color:var(--accent); color:var(--accent); font-weight:600}
+.subchip .c{font-weight:700; color:var(--ink); font-size:11.5px}
+.subchip.active .c{color:var(--accent)}
+
 .controls{
   position:sticky; top:62px; z-index:40; background:var(--card);
   padding:10px 12px; border:1px solid var(--line); border-radius:8px; margin-bottom:16px;
@@ -238,6 +251,7 @@ a{color:var(--accent)}
 
 <div class="wrap">
   <div class="stats" id="stats"></div>
+  <div class="substats" id="substats"></div>
 
   <div class="controls">
     <input type="search" id="search" placeholder="Хайх… (үүрэг чиглэл, хариуцагч, байгууллага)">
@@ -303,6 +317,25 @@ const SECTIONS = [
 const PALETTE = ["#1e49b6","#0e8f74"];
 const sectionColor = id => PALETTE[(id-1)%PALETTE.length];
 const sectionName = id => (SECTIONS.find(s=>s.id===id)||{}).name || "";
+
+// ---- Хэлтсийн зураглал: хариуцагч (албан хаагч / байгууллага) → харьяалагдах хэлтэс.
+// Хариуцагч нь хэлтэсээс тусдаа ойлголт — хариуцагч гэдэг нь тухайн үүрэг, чиглэлийг
+// хариуцаж хийх байгууллага, албан хаагч. Эх баримт бичигт (хурлын тэмдэглэл) хэлтсийн
+// мэдээлэл дурдагдаагүй тул энд гараар бөглөнө. "" үлдээвэл "Тодорхойгүй" бүлэгт орно.
+const DEPT_BY_RESP = {
+  "Ц.Сансармаа":"", "Ц.Мөнх-Эрдэнэ":"", "Н.Мөнхцэцэг":"", "Н.Бүрэнтэгш":"",
+  "Г.Эрдэнэбаяр":"", "Ч.Нандин-Эрдэнэ":"", "Г.Март":"", "Ш.Алимаа":"",
+  "С.Одбаяр":"", "О.Цасанцэцэг":"", "Л.Олзбаяр":"", "Д.Мэндбаяр":"",
+  "А.Номин":"", "АЗДТГ":"", "МЭГ":"", "Ёс зүйн хороо":"",
+};
+const UNKNOWN = "Тодорхойгүй";
+// нэг мөрөнд таслалаар тусгаарлагдсан олон хариуцагч байж болно
+function respList(item){ return String(item.r||"").split(",").map(x=>x.trim()).filter(Boolean); }
+function deptList(item){
+  const names = respList(item);
+  if(!names.length) return [UNKNOWN];
+  return [...new Set(names.map(n=> (DEPT_BY_RESP[n]||"").trim() || UNKNOWN))];
+}
 
 // ---- бүх үүрэг, чиглэлийн өгөгдөл (id, эх сурвалж, чиглэлийн текст, огноо, хариуцагч, хяналт тавигч, тайлбар)
 const RAW = [
@@ -388,45 +421,79 @@ function isDueDay(d){ return DUE_DATES.some(x=>sameDay(x,d)); }
 
 // ---------- filtering ----------
 let currentFilter = {q:"", sec:""};
-let specialFilter = null; // null | 'sec1' | 'sec2' | 'noresp' | 'due'
+let dueOnly = false;      // "Хугацаа дөхсөн" төлөв идэвхтэй эсэх
+let deptFilter = "";      // сонгосон хэлтэс
+let respFilter = "";      // сонгосон хариуцагч
+let openGroup = null;     // null | 'dept' | 'resp' — дэд шүүлтүүрийн мөр нээлттэй эсэх
 let selectedDay = null;
+
+// тодорхой эцсийн хугацаатай (эхлэх ≠ дуусах) үүрэг, чиглэл
+function hasDue(it){ return !!(it.start && it.end && it.start.getTime()!==it.end.getTime()); }
 
 function matches(item){
   const q = currentFilter.q.trim().toLowerCase();
   if(currentFilter.sec && String(item.sec)!==currentFilter.sec) return false;
-  if(specialFilter==='sec1' && item.sec!==1) return false;
-  if(specialFilter==='sec2' && item.sec!==2) return false;
-  if(specialFilter==='noresp' && item.r.trim()!=='') return false;
-  if(specialFilter==='due' && !(item.start && item.end && item.start.getTime()!==item.end.getTime())) return false;
+  if(dueOnly && !hasDue(item)) return false;
+  if(deptFilter && !deptList(item).includes(deptFilter)) return false;
+  if(respFilter && !(respFilter===UNKNOWN ? respList(item).length===0 : respList(item).includes(respFilter))) return false;
   if(!q) return true;
   return (item.t+" "+item.r+" "+item.c+" "+item.n+" "+sectionName(item.sec)).toLowerCase().includes(q);
 }
 
 // ---------- stats (ERP-style folder cards, click to filter) ----------
+// Бүлэг бүрийн (хэлтэс / хариуцагч) утга → тухайн утгад хамаарах ажлын тоо
+function groupCounts(kind){
+  const map = new Map();
+  DATA.forEach(it=>{
+    const keys = kind==='dept' ? deptList(it) : (respList(it).length ? respList(it) : [UNKNOWN]);
+    keys.forEach(k=> map.set(k, (map.get(k)||0)+1));
+  });
+  return [...map.entries()].sort((a,b)=>{
+    if(a[0]===UNKNOWN) return 1;
+    if(b[0]===UNKNOWN) return -1;
+    return b[1]-a[1] || a[0].localeCompare(b[0],"mn");
+  });
+}
+
 function renderStats(){
   const el = document.getElementById("stats");
-  const people = new Set();
-  DATA.forEach(d=> d.r.split(",").map(x=>x.trim()).filter(Boolean).forEach(x=> people.add(x)));
-  const dueCount = DATA.filter(d=> d.start && d.end && d.start.getTime()!==d.end.getTime()).length;
-  const sec1Count = DATA.filter(d=>d.sec===1).length;
-  const sec2Count = DATA.filter(d=>d.sec===2).length;
-  const noRespCount = DATA.filter(d=>d.r.trim()==='').length;
+  const depts = groupCounts('dept');
+  const resps = groupCounts('resp');
+  const dueCount = DATA.filter(hasDue).length;
+  const noFilter = !dueOnly && !deptFilter && !respFilter;
   const cards = [
-    {key:null,     ic:"📁", n:DATA.length,  l:"Нийт"},
-    {key:"sec1",   ic:"🗂️", n:sec1Count,    l:"07.09 — Засаг даргын үүрэг"},
-    {key:"sec2",   ic:"🗂️", n:sec2Count,    l:"07.20 — Ерөнхий сайдын хурал"},
-    {key:"noresp", ic:"📂", n:noRespCount,  l:"Хариуцагч тодорхойгүй"},
-    {key:"due",    ic:"⏰", n:dueCount,     l:"Тодорхой хугацаатай"},
+    {key:"all",  ic:"📁", n:DATA.length,   l:"Нийт",           on:noFilter},
+    {key:"dept", ic:"🏢", n:depts.length,  l:deptFilter || "Хэлтэс",      on:!!deptFilter || openGroup==='dept'},
+    {key:"resp", ic:"👤", n:resps.length,  l:respFilter || "Хариуцагч",   on:!!respFilter || openGroup==='resp'},
+    {key:"due",  ic:"⏰", n:dueCount,      l:"Хугацаа дөхсөн", on:dueOnly},
   ];
   el.innerHTML = cards.map(c=>`
-    <div class="stat ${specialFilter===c.key?'active':''}" data-key="${c.key||''}">
-      <div class="ic">${c.ic}</div><div class="txt"><div class="n">${c.n}</div><div class="l">${c.l}</div></div>
-    </div>`).join("")
-    + `<div class="stat" style="cursor:default"><div class="ic">🤝</div><div class="txt"><div class="n">~${people.size}</div><div class="l">Нэрлэсэн хариуцагч</div></div></div>`;
-  el.querySelectorAll(".stat[data-key]").forEach(c=> c.addEventListener("click", ()=>{
-    const key = c.dataset.key || null;
-    specialFilter = (specialFilter===key) ? null : key;
-    renderStats(); renderAll();
+    <div class="stat ${c.on?'active':''}" data-key="${c.key}">
+      <div class="ic">${c.ic}</div><div class="txt"><div class="n">${c.n}</div><div class="l">${escapeHtml(c.l)}</div></div>
+    </div>`).join("");
+  el.querySelectorAll(".stat").forEach(c=> c.addEventListener("click", ()=>{
+    const key = c.dataset.key;
+    if(key==="all"){ dueOnly=false; deptFilter=""; respFilter=""; openGroup=null; }
+    else if(key==="due"){ dueOnly = !dueOnly; openGroup=null; }
+    else openGroup = (openGroup===key) ? null : key;   // dept | resp — дэд мөр нээх/хаах
+    renderStats(); renderSubStats(); renderAll();
+  }));
+}
+
+// Хэлтэс / Хариуцагч картыг дарахад доор нь тухайн бүлгийн утгууд чипээр гарна
+function renderSubStats(){
+  const el = document.getElementById("substats");
+  if(!openGroup){ el.innerHTML = ""; return; }
+  const active = openGroup==='dept' ? deptFilter : respFilter;
+  el.innerHTML = groupCounts(openGroup).map(([name,n])=>`
+    <div class="subchip ${active===name?'active':''}" data-val="${escapeAttr(name)}">
+      ${escapeHtml(name)} <span class="c">${n}</span>
+    </div>`).join("");
+  el.querySelectorAll(".subchip").forEach(ch=> ch.addEventListener("click", ()=>{
+    const val = ch.dataset.val;
+    if(openGroup==='dept') deptFilter = (deptFilter===val) ? "" : val;
+    else respFilter = (respFilter===val) ? "" : val;
+    renderStats(); renderSubStats(); renderAll();
   }));
 }
 
@@ -600,6 +667,7 @@ document.getElementById("search").addEventListener("input", e=>{ currentFilter.q
 document.getElementById("sectionFilter").addEventListener("change", e=>{ currentFilter.sec = e.target.value; renderAll(); });
 
 renderStats();
+renderSubStats();
 renderSectionFilter();
 renderAll();
 document.getElementById("genDate").textContent = "Үүсгэсэн: " + new Date().toLocaleDateString("mn-MN");
