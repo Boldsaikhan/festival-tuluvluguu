@@ -128,7 +128,7 @@ section.view.active{display:block}
 
 /* ---------- List view ---------- */
 .list-table-wrap{overflow-x:auto; border:1px solid var(--line); border-radius:var(--radius); background:var(--card); box-shadow:var(--shadow)}
-table.list{width:100%; border-collapse:collapse; font-size:12.5px; min-width:900px}
+table.list{width:100%; border-collapse:collapse; font-size:12.5px; min-width:1150px}
 table.list th{
   text-align:left; background:var(--sand-2); padding:8px 12px; font-size:11.5px;
   font-weight:600; color:var(--ink-soft); position:sticky; top:0; border-bottom:1px solid var(--line);
@@ -142,6 +142,57 @@ table.list tr:hover td{background:var(--main-event)}
 .resp-cell{white-space:nowrap}
 .act-cell{min-width:280px}
 .note-cell{color:var(--ink-soft); font-size:12px; max-width:260px}
+
+/* ---------- Засварлагдах нүднүүд ---------- */
+table.list td.edit{cursor:text; border-radius:4px}
+table.list td.edit:hover{box-shadow:0 0 0 1px var(--accent-2) inset}
+table.list td.edit:focus{outline:2px solid var(--accent); outline-offset:-2px; background:var(--card)}
+table.list td.edit:empty::before{content:"—"; color:#aeb6c6}
+.cell-date{
+  font:inherit; font-size:12px; color:var(--ink); background:transparent;
+  border:1px solid transparent; border-radius:4px; padding:2px 4px; width:132px;
+}
+.cell-date:hover{border-color:var(--accent-2)}
+.cell-date:focus{outline:none; border-color:var(--accent); background:var(--card)}
+.mini-btn{
+  font:inherit; font-size:12px; padding:4px 10px; border-radius:6px; cursor:pointer;
+  border:1px solid var(--line); background:var(--card); color:var(--ink-soft);
+}
+.mini-btn:hover{border-color:var(--accent); color:var(--accent)}
+.dirty-dot{display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--accent); margin-left:5px; vertical-align:middle}
+
+/* ---------- Хэрэгжилт ---------- */
+.prog-cell{min-width:170px; width:170px}
+.prog{display:flex; align-items:center; gap:6px; min-width:150px}
+.prog .pct{font-size:11px; color:var(--ink-soft)}
+.prog-bar{flex:1; height:7px; border-radius:5px; background:var(--sand-2); border:1px solid var(--line); overflow:hidden}
+.prog-fill{height:100%; background:var(--accent); border-radius:5px; transition:width .15s}
+.prog-fill.done{background:#0e8f74}
+.prog-fill.late{background:#d9534f}
+.prog-num{font-size:11.5px; font-weight:700; font-variant-numeric:tabular-nums; width:38px; text-align:right;
+  border:1px solid transparent; border-radius:4px; background:transparent; color:var(--ink); padding:1px 2px}
+.prog-num:hover{border-color:var(--accent-2)}
+.prog-num:focus{outline:none; border-color:var(--accent); background:var(--card)}
+.st{display:inline-block; padding:1px 7px; border-radius:20px; font-size:10.5px; font-weight:600; white-space:nowrap}
+.st.none{background:var(--sand-2); color:var(--ink-soft)}
+.st.doing{background:#e6efff; color:#1e49b6}
+.st.done{background:#dcf3ec; color:#0b6b57}
+.st.late{background:#fde3e2; color:#b0322e}
+
+/* ---------- Хэрэгжилтийн харагдац (өдөр / 7 хоног / сар) ---------- */
+.periodbar{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:14px}
+.imp-groups{display:flex; flex-direction:column; gap:12px}
+.imp-group{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden}
+.imp-head{display:flex; align-items:center; gap:12px; padding:10px 14px; background:var(--sand-2); border-bottom:1px solid var(--line); cursor:pointer}
+.imp-head .ttl{font-weight:700; font-size:13px; white-space:nowrap}
+.imp-head .cnt{font-size:11.5px; color:var(--ink-soft); white-space:nowrap}
+.imp-head .prog{flex:1; max-width:320px; margin-left:auto}
+.imp-items{padding:6px 8px; display:flex; flex-direction:column; gap:4px}
+.imp-row{display:flex; align-items:center; gap:10px; padding:6px 8px; border-radius:6px; cursor:pointer; font-size:12.5px}
+.imp-row:hover{background:var(--main-event)}
+.imp-row .tt{flex:1; min-width:0}
+.imp-row .rr{color:var(--ink-soft); font-size:11.5px; white-space:nowrap}
+.imp-row .prog{width:140px; flex:none}
 
 /* ---------- Calendar view ---------- */
 .cal-months{display:grid; grid-template-columns:1fr; gap:26px}
@@ -260,6 +311,7 @@ a{color:var(--accent)}
       <button data-view="list" class="active">📋 Жагсаалт</button>
       <button data-view="cal">📅 Хуанли</button>
       <button data-view="tl">📊 Хугацааны шугам</button>
+      <button data-view="imp">📈 Хэрэгжилт</button>
     </div>
     <span class="result-count" id="resultCount"></span>
   </div>
@@ -276,15 +328,34 @@ a{color:var(--accent)}
     <div class="tl-scroll"><div class="tl-inner" id="tlInner"></div></div>
   </section>
 
+  <section class="view" id="view-imp">
+    <div class="periodbar">
+      <span style="font-size:12.5px;color:var(--ink-soft)">Хэрэгжилтийг харах:</span>
+      <div class="viewtoggle" id="periodToggle">
+        <button data-period="day">📆 Өдрөөр</button>
+        <button data-period="week" class="active">🗓️ 7 хоногоор</button>
+        <button data-period="month">📅 Сараар</button>
+      </div>
+      <span class="result-count" id="impSummary"></span>
+    </div>
+    <div class="imp-groups" id="impGroups"></div>
+  </section>
+
   <section class="view active" id="view-list">
     <div class="list-table-wrap">
       <table class="list">
         <thead><tr>
           <th>№</th><th>Огноо</th><th>Эх сурвалж</th><th class="act-cell">Үүрэг, чиглэл</th>
-          <th>Хариуцагч</th><th>Хяналт тавих</th><th class="note-cell">Тайлбар</th>
+          <th>Хариуцагч</th><th>Хяналт тавих</th><th>Гүйцэтгэх хугацаа</th>
+          <th class="prog-cell">Хэрэгжилт</th><th class="note-cell">Тайлбар</th>
         </tr></thead>
         <tbody id="listBody"></tbody>
       </table>
+    </div>
+    <div style="margin-top:10px; display:flex; gap:10px; align-items:center; flex-wrap:wrap; font-size:12px; color:var(--ink-soft)">
+      <span>✏️ Хариуцагч, Хяналт тавих, Тайлбар нүдийг дарж шууд засна. Гүйцэтгэх хугацаа, Хэрэгжилтийн хувийг талбарт нь оруулна. Өөрчлөлт таны браузерт (localStorage) хадгалагдана.</span>
+      <button id="resetEdits" class="mini-btn">↺ Бүх засварыг цуцлах</button>
+      <span id="editCount"></span>
     </div>
   </section>
 
@@ -300,6 +371,8 @@ a{color:var(--accent)}
     <h3 id="mTitle"></h3>
     <dl>
       <dt>Хугацаа</dt><dd id="mPeriod"></dd>
+      <dt>Гүйцэтгэх хугацаа</dt><dd id="mDue"></dd>
+      <dt>Хэрэгжилт</dt><dd id="mProg"></dd>
       <dt>Хариуцагч</dt><dd id="mResp"></dd>
       <dt>Хяналт тавих</dt><dd id="mCollab"></dd>
       <dt>Тайлбар</dt><dd id="mNote"></dd>
@@ -396,8 +469,47 @@ const RAW = [
 const DATA = RAW.map((r,i)=>{
   const [sec,t,p,r1,c,n] = r;
   const per = parsePeriod(p);
-  return {id:i+1, sec, t, p, r:r1, c, n, start:per.start, end:per.end};
+  return {id:i+1, sec, t, p, r:r1, c, n, start:per.start, end:per.end, prog:0,
+          base:{p, r:r1, c, n, end:per.end}};
 });
+
+// ---------- Хэрэглэгчийн засвар (localStorage) ----------
+// Статик сайт тул сервер байхгүй — засварыг зөвхөн тухайн браузерт хадгална.
+const STORE_KEY = "uch_overrides_v1";
+let OVERRIDES = {};
+try{ OVERRIDES = JSON.parse(localStorage.getItem(STORE_KEY) || "{}") || {}; }catch(e){ OVERRIDES = {}; }
+function saveOverrides(){ try{ localStorage.setItem(STORE_KEY, JSON.stringify(OVERRIDES)); }catch(e){} }
+function setOverride(id, field, value){
+  const o = OVERRIDES[id] || (OVERRIDES[id] = {});
+  const it = DATA.find(d=>d.id===id);
+  const baseVal = field==='due' ? toISO(it.base.end) : field==='prog' ? 0 : it.base[field];
+  if(String(value) === String(baseVal ?? "")) delete o[field]; else o[field] = value;
+  if(!Object.keys(o).length) delete OVERRIDES[id];
+  saveOverrides(); applyOverrides();
+}
+function toISO(d){ return d ? `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}` : ""; }
+function fromISO(s){ const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(s||"")); return m ? new Date(+m[1], +m[2]-1, +m[3]) : null; }
+
+// Засварыг үндсэн өгөгдөл дээр давхарлаж тавина
+function applyOverrides(){
+  DATA.forEach(it=>{
+    const o = OVERRIDES[it.id] || {};
+    it.r = o.r !== undefined ? o.r : it.base.r;
+    it.c = o.c !== undefined ? o.c : it.base.c;
+    it.n = o.n !== undefined ? o.n : it.base.n;
+    it.prog = Math.max(0, Math.min(100, Number(o.prog ?? 0) || 0));
+    const dueOv = o.due !== undefined ? fromISO(o.due) : null;
+    it.end = dueOv || it.base.end;
+    it.p = !it.start ? it.base.p
+      : (it.end && it.start.getTime()!==it.end.getTime())
+        ? `${fmtMD(it.start)}-${fmtMD(it.end)}` : fmtMD(it.start);
+    it.edited = Object.keys(o).length > 0;
+  });
+}
+function resetAllEdits(){
+  OVERRIDES = {}; saveOverrides(); applyOverrides();
+  renderStats(); renderSubStats(); renderAll();
+}
 
 function parsePeriod(str){
   const m = [...str.matchAll(/(\d{1,2})\.(\d{1,3})/g)];
@@ -408,6 +520,7 @@ function parsePeriod(str){
   return end < start ? {start:end,end:start} : {start,end};
 }
 function fmtD(d){ if(!d) return ""; return (d.getMonth()+1)+"."+String(d.getDate()).padStart(2,"0"); }
+function fmtMD(d){ if(!d) return ""; return String(d.getMonth()+1).padStart(2,"0")+"."+String(d.getDate()).padStart(2,"0"); }
 function sameDay(a,b){ return a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate(); }
 function inRange(d,s,e){ return d>=new Date(s.getFullYear(),s.getMonth(),s.getDate()) && d<=new Date(e.getFullYear(),e.getMonth(),e.getDate()); }
 // Хуанли дээр item-ийг зөвхөн ГАРСАН (start) болон ДУУСАХ (end) өдөрт нь харуулна — дунд орсон бүх өдрүүдэд "нээлттэй хэвээр" гэж бөглөрөл үүсгэхгүй (Gantt/timeline харагдацад л бүх мужийг дүрсэлнэ).
@@ -416,8 +529,30 @@ function occursOnDay(it,date){ return it.start && (sameDay(date,it.start) || (it
 const MEETING_DATES = [new Date(YEAR,6,9), new Date(YEAR,6,20)];
 function isMeetingDay(d){ return MEETING_DATES.some(m=>sameDay(m,d)); }
 // тодорхой эцсийн хугацаатай (start !== end) үүрэг чиглэлийн дуусах өдрүүд
-const DUE_DATES = DATA.filter(it=> it.start && it.end && it.start.getTime()!==it.end.getTime()).map(it=>it.end);
-function isDueDay(d){ return DUE_DATES.some(x=>sameDay(x,d)); }
+// (гүйцэтгэх хугацааг засварлаж болдог тул тогтмол биш, дуудах бүрд шинэчлэгдэнэ)
+function dueDates(){ return DATA.filter(hasDue).map(it=>it.end); }
+function isDueDay(d){ return dueDates().some(x=>sameDay(x,d)); }
+
+// ---------- Хэрэгжилтийн төлөв ----------
+const TODAY = (()=>{ const n = new Date(); return new Date(n.getFullYear(), n.getMonth(), n.getDate()); })();
+function statusOf(it){
+  if(it.prog >= 100) return {k:"done",  l:"Хэрэгжсэн"};
+  // "Хугацаа хэтэрсэн" гэж зөвхөн ТОДОРХОЙ гүйцэтгэх хугацаа заасан ажилд тооцно.
+  // Хугацаа заагаагүй ажлын end нь хурлын огноо байдаг тул түүнийг хэтэрсэн гэж үзэхгүй.
+  if(hasDue(it) && it.end < TODAY) return {k:"late", l:"Хугацаа хэтэрсэн"};
+  if(it.prog > 0) return {k:"doing", l:"Хэрэгжиж байна"};
+  return {k:"none", l:"Эхлээгүй"};
+}
+function progBar(it, editable){
+  const st = statusOf(it);
+  const num = editable
+    ? `<input class="prog-num" type="number" min="0" max="100" step="5" value="${it.prog}" data-id="${it.id}" title="Хэрэгжилтийн хувь"><span class="pct">%</span>`
+    : `<span class="prog-num">${it.prog}%</span>`;
+  return `<div class="prog" title="${st.l}">
+      <div class="prog-bar"><div class="prog-fill ${st.k==='done'?'done':st.k==='late'?'late':''}" style="width:${it.prog}%"></div></div>
+      ${num}
+    </div>`;
+}
 
 // ---------- filtering ----------
 let currentFilter = {q:"", sec:""};
@@ -613,16 +748,134 @@ function renderList(){
   const items = DATA.filter(matches).slice().sort((a,b)=> (a.start-b.start) || (a.sec-b.sec));
   const body = document.getElementById("listBody");
   body.innerHTML = items.map(it=>`
-    <tr class="${it.start && it.end && it.start.getTime()!==it.end.getTime() ? 'urgent' : ''}">
-      <td>${it.id}</td>
+    <tr class="${hasDue(it) ? 'urgent' : ''}">
+      <td>${it.id}${it.edited?'<span class="dirty-dot" title="Засварласан"></span>':''}</td>
       <td class="period-cell">${it.p}</td>
       <td><span class="tag" style="background:${sectionColor(it.sec)}">${it.sec}</span></td>
       <td class="act-cell">${escapeHtml(it.t)}</td>
-      <td class="resp-cell">${escapeHtml(it.r)}</td>
-      <td>${escapeHtml(it.c)}</td>
-      <td class="note-cell">${escapeHtml(it.n)}</td>
+      <td class="resp-cell edit" contenteditable="true" data-id="${it.id}" data-f="r">${escapeHtml(it.r)}</td>
+      <td class="edit" contenteditable="true" data-id="${it.id}" data-f="c">${escapeHtml(it.c)}</td>
+      <td><input class="cell-date" type="date" value="${toISO(it.end)}" data-id="${it.id}" title="Хийж гүйцэтгэх эцсийн хугацаа"></td>
+      <td class="prog-cell">${progBar(it, true)}<div style="margin-top:4px"><span class="st ${statusOf(it).k}">${statusOf(it).l}</span></div></td>
+      <td class="note-cell edit" contenteditable="true" data-id="${it.id}" data-f="n">${escapeHtml(it.n)}</td>
     </tr>`).join("");
+  wireEditors(body);
+  const n = Object.keys(OVERRIDES).length;
+  document.getElementById("editCount").textContent = n ? `${n} мөр засварласан` : "";
 }
+
+// Засварлагдах нүднүүдийг холбох (текст нүд, огноо, хэрэгжилтийн хувь)
+function wireEditors(root){
+  root.querySelectorAll("td.edit[contenteditable]").forEach(td=>{
+    td.addEventListener("blur", ()=>{
+      const val = td.textContent.replace(/\s+/g," ").trim();
+      setOverride(+td.dataset.id, td.dataset.f, val);
+      refreshAfterEdit(false);
+    });
+    td.addEventListener("keydown", e=>{
+      if(e.key==="Enter"){ e.preventDefault(); td.blur(); }
+      if(e.key==="Escape"){ e.preventDefault(); renderList(); }
+    });
+  });
+  root.querySelectorAll("input.cell-date").forEach(inp=>{
+    inp.addEventListener("change", ()=>{
+      setOverride(+inp.dataset.id, "due", inp.value);
+      refreshAfterEdit(true);
+    });
+  });
+  root.querySelectorAll("input.prog-num").forEach(inp=>{
+    inp.addEventListener("change", ()=>{
+      const v = Math.max(0, Math.min(100, Number(inp.value)||0));
+      setOverride(+inp.dataset.id, "prog", v);
+      refreshAfterEdit(true);
+    });
+  });
+}
+// full=true бол бүх харагдацыг дахин зурна; false бол зөвхөн тоолуур/шүүлтүүрийг
+function refreshAfterEdit(full){
+  renderStats(); renderSubStats();
+  if(full) renderAll(); else {
+    const c = DATA.filter(matches).length;
+    document.getElementById("resultCount").textContent = `${c} / ${DATA.length} үйл ажиллагаа`;
+    const n = Object.keys(OVERRIDES).length;
+    document.getElementById("editCount").textContent = n ? `${n} мөр засварласан` : "";
+  }
+}
+
+// ---------- Хэрэгжилтийн харагдац (өдөр / 7 хоног / сар) ----------
+let impPeriod = "week";                 // 'day' | 'week' | 'month'
+const collapsedGroups = new Set();      // хаасан бүлгүүд
+
+function startOfWeek(d){ const x = new Date(d.getFullYear(), d.getMonth(), d.getDate()); x.setDate(x.getDate() - ((x.getDay()+6)%7)); return x; }
+function addDays(d,n){ const x = new Date(d.getFullYear(), d.getMonth(), d.getDate()); x.setDate(x.getDate()+n); return x; }
+
+// Ажлыг гүйцэтгэх хугацаагаар нь тухайн үеийн (өдөр/7 хоног/сар) бүлэгт хуваарилна
+function bucketOf(it, mode){
+  const d = it.end || it.start;
+  if(!d) return {key:"none", label:"Хугацаа тодорхойгүй", sort:Infinity};
+  if(mode==="day")   return {key:toISO(d), label:`${fmtMD(d)} (${DOW[(d.getDay()+6)%7]})`, sort:d.getTime()};
+  if(mode==="month") return {key:`${d.getFullYear()}-${d.getMonth()}`, label:MONTH_NAMES[d.getMonth()], sort:new Date(d.getFullYear(),d.getMonth(),1).getTime()};
+  const s = startOfWeek(d), e = addDays(s,6);
+  return {key:toISO(s), label:`${fmtMD(s)} – ${fmtMD(e)}`, sort:s.getTime()};
+}
+
+function renderImplementation(){
+  const items = DATA.filter(matches);
+  const groups = new Map();
+  items.forEach(it=>{
+    const b = bucketOf(it, impPeriod);
+    if(!groups.has(b.key)) groups.set(b.key, {...b, items:[]});
+    groups.get(b.key).items.push(it);
+  });
+  const list = [...groups.values()].sort((a,b)=> a.sort-b.sort);
+
+  const avgAll = items.length ? Math.round(items.reduce((s,x)=>s+x.prog,0)/items.length) : 0;
+  const doneAll = items.filter(x=>x.prog>=100).length;
+  const lateAll = items.filter(x=>statusOf(x).k==="late").length;
+  document.getElementById("impSummary").textContent =
+    `Дундаж хэрэгжилт ${avgAll}% · ${doneAll} хэрэгжсэн · ${lateAll} хугацаа хэтэрсэн · ${items.length} ажил`;
+
+  const wrap = document.getElementById("impGroups");
+  if(!list.length){ wrap.innerHTML = `<div class="empty-note">Шүүлтүүрт тохирох ажил алга.</div>`; return; }
+  wrap.innerHTML = list.map(g=>{
+    const avg = Math.round(g.items.reduce((s,x)=>s+x.prog,0)/g.items.length);
+    const done = g.items.filter(x=>x.prog>=100).length;
+    const open = !collapsedGroups.has(g.key);
+    return `<div class="imp-group">
+      <div class="imp-head" data-g="${escapeAttr(g.key)}">
+        <span class="ttl">${open?'▾':'▸'} ${escapeHtml(g.label)}</span>
+        <span class="cnt">${g.items.length} ажил · ${done} хэрэгжсэн</span>
+        <div class="prog"><div class="prog-bar"><div class="prog-fill ${avg>=100?'done':''}" style="width:${avg}%"></div></div><span class="prog-num">${avg}%</span></div>
+      </div>
+      <div class="imp-items" style="${open?'':'display:none'}">
+        ${g.items.map(it=>`
+          <div class="imp-row">
+            <span class="tag" style="background:${sectionColor(it.sec)}">${it.sec}</span>
+            <span class="tt" data-open="${it.id}">${escapeHtml(it.t)}</span>
+            <span class="rr">${escapeHtml(it.r || "—")}</span>
+            <span class="st ${statusOf(it).k}">${statusOf(it).l}</span>
+            ${progBar(it, true)}
+          </div>`).join("")}
+      </div>
+    </div>`;
+  }).join("");
+
+  wrap.querySelectorAll(".imp-head").forEach(h=> h.addEventListener("click", e=>{
+    if(e.target.closest(".prog")) return;
+    const k = h.dataset.g;
+    if(collapsedGroups.has(k)) collapsedGroups.delete(k); else collapsedGroups.add(k);
+    renderImplementation();
+  }));
+  wrap.querySelectorAll("[data-open]").forEach(t=> t.addEventListener("click", ()=> openModal(+t.dataset.open)));
+  wireEditors(wrap);
+}
+
+document.querySelectorAll("#periodToggle button").forEach(b=> b.addEventListener("click", ()=>{
+  impPeriod = b.dataset.period;
+  document.querySelectorAll("#periodToggle button").forEach(x=> x.classList.toggle("active", x===b));
+  collapsedGroups.clear();
+  renderImplementation();
+}));
 
 // ---------- Modal ----------
 function openModal(id){
@@ -632,6 +885,8 @@ function openModal(id){
   document.getElementById("mTag").style.background = sectionColor(it.sec);
   document.getElementById("mTitle").textContent = it.t;
   document.getElementById("mPeriod").textContent = it.p + (it.start? `  (${fmtD(it.start)} – ${fmtD(it.end)})`:'');
+  document.getElementById("mDue").textContent = it.end ? `${it.end.getFullYear()}.${fmtMD(it.end)}` : "—";
+  document.getElementById("mProg").innerHTML = `${progBar(it,false)}<span class="st ${statusOf(it).k}" style="margin-top:4px;display:inline-block">${statusOf(it).l}</span>`;
   document.getElementById("mResp").textContent = it.r || "—";
   document.getElementById("mCollab").textContent = it.c || "—";
   document.getElementById("mNote").textContent = it.n || "—";
@@ -661,11 +916,18 @@ function renderAll(){
   if(activeView==="cal"){ renderCalendar(); if(selectedDay) showDayDetail(selectedDay); }
   if(activeView==="tl") renderTimeline();
   if(activeView==="list") renderList();
+  if(activeView==="imp") renderImplementation();
 }
 
 document.getElementById("search").addEventListener("input", e=>{ currentFilter.q = e.target.value; renderAll(); });
 document.getElementById("sectionFilter").addEventListener("change", e=>{ currentFilter.sec = e.target.value; renderAll(); });
 
+document.getElementById("resetEdits").addEventListener("click", ()=>{
+  if(!Object.keys(OVERRIDES).length){ alert("Засвар хийгээгүй байна."); return; }
+  if(confirm("Гараар хийсэн бүх засвар (хариуцагч, хугацаа, хэрэгжилт, тайлбар) устаж, эх баримтын анхны утга сэргэнэ. Үргэлжлүүлэх үү?")) resetAllEdits();
+});
+
+applyOverrides();
 renderStats();
 renderSubStats();
 renderSectionFilter();
