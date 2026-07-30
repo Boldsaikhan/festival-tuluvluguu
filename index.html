@@ -162,7 +162,12 @@ table.list tr:hover td{background:var(--main-event)}
 .hero-num{font-size:28px; font-weight:800; line-height:1; color:var(--accent);
   font-variant-numeric:tabular-nums; margin-left:auto}
 .sm-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(226px,1fr)); gap:10px}
-.sm-card{border:1px solid var(--line); border-radius:8px; padding:9px 11px 5px; background:var(--card)}
+.sm-card{border:1px solid var(--line); border-radius:8px; padding:9px 11px 5px; background:var(--card);
+  cursor:pointer; transition:border-color .12s, box-shadow .12s}
+.sm-card:hover{border-color:var(--accent-2); box-shadow:0 2px 8px rgba(20,30,60,.10)}
+.sm-card:focus-visible{outline:2px solid var(--accent); outline-offset:1px}
+.sm-card.active{border-color:var(--accent); box-shadow:0 0 0 1px var(--accent) inset}
+.sm-card.active .sm-name{color:var(--accent)}
 .sm-top{display:flex; justify-content:space-between; align-items:baseline; gap:8px; margin-bottom:2px}
 .sm-name{font-size:12px; font-weight:600; color:var(--ink); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
 .sm-val{font-size:13.5px; font-weight:700; color:var(--accent); font-variant-numeric:tabular-nums; flex:none}
@@ -710,15 +715,19 @@ let selectedDay = null;
 // тодорхой эцсийн хугацаатай (эхлэх ≠ дуусах) үүрэг, чиглэл
 function hasDue(it){ return !!(it.start && it.end && it.start.getTime()!==it.end.getTime()); }
 
-function matches(item){
+function matchesBase(item, useSal){
   const q = currentFilter.q.trim().toLowerCase();
   if(currentFilter.sec && String(item.sec)!==currentFilter.sec) return false;
   if(dueOnly && !hasDue(item)) return false;
-  if(salFilter && !salList(item).includes(salFilter)) return false;
+  if(useSal && salFilter && !salList(item).includes(salFilter)) return false;
   if(respFilter && !(respFilter===UNKNOWN ? respList(item).length===0 : respList(item).includes(respFilter))) return false;
   if(!q) return true;
   return (item.t+" "+item.r+" "+item.c+" "+item.n+" "+sectionName(item.sec)).toLowerCase().includes(q);
 }
+function matches(item){ return matchesBase(item, true); }
+// Салбарын шүүлтүүрийг тооцохгүй — салбарын панелиуд сонголт хийсний дараа ч
+// бүгд харагдаж, өөр салбар рүү шууд сэлгэх боломжтой байхын тулд
+function matchesNoSal(item){ return matchesBase(item, false); }
 
 // ---------- stats (ERP-style folder cards, click to filter) ----------
 // Бүлэг бүрийн (хэлтэс / хариуцагч) утга → тухайн утгад хамаарах ажлын тоо
@@ -1036,24 +1045,27 @@ function renderWeekCharts(items){
 
   // салбараар бүлэглэсэн жижиг график (small multiples) — 9 салбарыг нэг тэнхлэгт
   // хольж спагетти болгохын оронд салбар тус бүрд өөрийн панель
+  // Панелиуд салбарын шүүлтүүрээс хамаарахгүй (сонгосны дараа ч бүгд харагдана)
+  const panelScope = DATA.filter(matchesNoSal).filter(it=> it.sec===2 || plan.length===0);
   const groups = new Map();
-  scope.forEach(it=>{ const k = salList(it)[0]; (groups.get(k) || groups.set(k,[]).get(k)).push(it); });
+  panelScope.forEach(it=>{ const k = salList(it)[0]; (groups.get(k) || groups.set(k,[]).get(k)).push(it); });
   const order = [...groups.keys()].sort((a,b)=> a===UNKNOWN ? 1 : b===UNKNOWN ? -1 : 0);
 
   el.innerHTML = `
     <div class="chartbox">
       <div class="chart-head">
-        <span class="chart-title">Явцын хэрэгжилтийн хувь — нийт дундаж</span>
+        <span class="chart-title">Явцын хэрэгжилтийн хувь — ${salFilter ? escapeHtml(salFilter) : "нийт дундаж"}</span>
         <span class="chart-sub">${scope.length} ажил · 7 хоног тутам · хүрэх түвшин 100%</span>
+        ${salFilter ? `<button class="mini-btn" id="salClear">✕ ${escapeHtml(salFilter)} — шүүлтүүр цуцлах</button>` : ''}
         <span class="hero-num">${now}%</span>
       </div>
-      ${lineChart(avgs, {name:"Нийт дундаж"})}
+      ${lineChart(avgs, {name: salFilter || "Нийт дундаж"})}
       ${filled.length ? '' : `<div class="ch-empty">7 хоногийн явц хараахан бөглөгдөөгүй — доорх хүснэгтэд хувь оруулахад график шууд зурагдана.</div>`}
     </div>
     <div class="chartbox">
       <div class="chart-head">
         <span class="chart-title">Салбар тус бүрийн явц</span>
-        <span class="chart-sub">бүгд ижил 0–100% тэнхлэгтэй, харьцуулж уншина</span>
+        <span class="chart-sub">бүгд ижил 0–100% тэнхлэгтэй · <b>салбар дээр дарж</b> тухайн салбарын үйл ажиллагааг шүүнэ</span>
       </div>
       <div class="sm-grid">
         ${order.map(sal=>{
@@ -1061,9 +1073,10 @@ function renderWeekCharts(items){
           const a = weekAvgs(list);
           const f = a.filter(v=> v!==null);
           const cur = f.length ? f[f.length-1] : 0;
-          return `<div class="sm-card">
+          return `<div class="sm-card ${salFilter===sal?'active':''}" data-sal="${escapeAttr(sal)}"
+                       role="button" tabindex="0" title="${escapeAttr(sal)} — дарж шүүх">
             <div class="sm-top">
-              <span class="sm-name" title="${escapeAttr(sal)}">${escapeHtml(sal)}</span>
+              <span class="sm-name">${escapeHtml(sal)}</span>
               <span class="sm-val ${cur?'':'zero'}">${cur}%</span>
             </div>
             <div class="sm-cnt">${list.length} ажил</div>
@@ -1072,6 +1085,19 @@ function renderWeekCharts(items){
         }).join("")}
       </div>
     </div>`;
+
+  // салбарын панель дээр дарахад тухайн салбараар шүүнэ (дахин дарвал цуцлагдана)
+  const pick = sal =>{
+    salFilter = (salFilter===sal) ? "" : sal;
+    openGroup = null;
+    renderStats(); renderSubStats(); renderAll();
+  };
+  el.querySelectorAll(".sm-card").forEach(c=>{
+    c.addEventListener("click", ()=> pick(c.dataset.sal));
+    c.addEventListener("keydown", e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); pick(c.dataset.sal); } });
+  });
+  const clr = document.getElementById("salClear");
+  if(clr) clr.addEventListener("click", ()=> pick(salFilter));
 
   wireChartTips(el);
 }
