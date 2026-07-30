@@ -71,6 +71,7 @@ bash tools/check.sh
 ## 6. Git ба Deploy урсгал
 - **GitHub:** https://github.com/Boldsaikhan/festival-tuluvluguu (private), үндсэн branch `main`. (Repo нэр хуучин фестивалийн агуулгаас үлдсэн — агуулга солигдсон ч нэрийг өөрчлөөгүй.)
 - **Netlify:** production https://pp-100.netlify.app (`pp` нэр аль хэдийн эзэмшигдсэн байсан тул `pp-100` болсон). Site холбоос локал `.netlify/state.json`-д хадгалагдсан (`.gitignore`-д орсон тул commit хийгдэхгүй — шинэ машин дээр `npx netlify-cli link --id 3345998a-7929-4697-b330-256d362b2cdb` хийж холбоно).
+- **🔴 2026-07-30-наас Netlify deploy БЛОКЛОГДСОН.** API нь `HTTP 403` + `{"error":"Account credit usage exceeded - new deploys are blocked until credits are added"}` буцаана. Free plan-ийн credit дууссан — **хэрэглэгч credit нэмэх/plan сайжруулах хүртэл `netlify deploy` ажиллахгүй** (`app.netlify.com/teams/ca-boogii/billing`). Нэвтрэлт, site холбоос, `state:current` бүгд хэвийн — асуудал зөвхөн billing. Deploy оролдоод 403 гарвал дахин дахин бүү оролд, хэрэглэгчид мэдэгд. Live дээр `fd5adf9` хувилбар зогссон.
 - **⚠️ GitHub → Netlify автомат холбоос ХИЙГДЭЭГҮЙ.** `git push` хийхэд Netlify өөрөө шинэчлэгдэхгүй — заавал тусад нь дараах коммандыг ажиллуул:
   ```bash
   npx --yes netlify-cli deploy --prod --dir=.
