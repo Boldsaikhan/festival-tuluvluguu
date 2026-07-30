@@ -146,8 +146,6 @@ table.list tr:hover td{background:var(--main-event)}
 .resp-cell{white-space:nowrap}
 .ctrl-cell{white-space:nowrap}
 .sal-cell{min-width:120px}
-.salpill{display:inline-block; padding:2px 8px; border-radius:20px; font-size:10.5px; font-weight:600;
-  background:var(--sand-2); color:var(--ink-soft); border:1px solid var(--line); white-space:nowrap}
 .ind-cell{font-size:11.5px; color:var(--ink-soft); min-width:130px; max-width:170px}
 .lvl{font-variant-numeric:tabular-nums; font-weight:600; white-space:nowrap}
 .lvl.tgt{color:var(--accent)}
@@ -194,10 +192,10 @@ table.wk td.task{text-align:left; min-width:280px; max-width:420px}
 .note-cell{color:var(--ink-soft); font-size:12px; max-width:200px}
 
 /* ---------- Засварлагдах нүднүүд ---------- */
-table.list td.edit{cursor:text; border-radius:4px}
-table.list td.edit:hover{box-shadow:0 0 0 1px var(--accent-2) inset}
-table.list td.edit:focus{outline:2px solid var(--accent); outline-offset:-2px; background:var(--card)}
-table.list td.edit:empty::before{content:"—"; color:#aeb6c6}
+td.edit{cursor:text; border-radius:4px}
+td.edit:hover{box-shadow:0 0 0 1px var(--accent-2) inset}
+td.edit:focus{outline:2px solid var(--accent); outline-offset:-2px; background:var(--card); text-align:left}
+td.edit:empty::before{content:"—"; color:#aeb6c6}
 .cell-date{
   font:inherit; font-size:12px; color:var(--ink); background:transparent;
   border:1px solid transparent; border-radius:4px; padding:2px 4px; width:132px; text-align:center;
@@ -371,7 +369,7 @@ a{color:var(--accent)}
     <div id="wkCharts"></div>
     <div class="list-table-wrap"><table class="wk"><thead id="wkHead"></thead><tbody id="wkBody"></tbody></table></div>
     <div style="margin-top:10px; font-size:12px; color:var(--ink-soft)">
-      ✏️ Хэрэгжилтийн хувийг ажил тус бүрд 0–100 хооронд оруулна. Салбарын мөрөнд тухайн салбарын <b>дундаж хэрэгжилт</b>, дээрх графикт нийт болон салбарын хэрэгжилт шууд шинэчлэгдэнэ.
+      ✏️ <b>Бүх нүдийг</b> дарж шууд засна (үйл ажиллагаа, шалгуур үзүүлэлт, суурь/хүрэх түвшин). Хэрэгжилтийн хувийг 0–100 хооронд оруулна. Салбарын мөрөнд тухайн салбарын <b>дундаж хэрэгжилт</b>, дээрх графикт нийт болон салбарын хэрэгжилт шууд шинэчлэгдэнэ.
     </div>
   </section>
 
@@ -401,7 +399,7 @@ a{color:var(--accent)}
       </table>
     </div>
     <div style="margin-top:10px; display:flex; gap:10px; align-items:center; flex-wrap:wrap; font-size:12px; color:var(--ink-soft)">
-      <span>✏️ Хариуцагч, Хамтран/Хяналт, Тайлбар нүдийг дарж шууд засна. Хэрэгжилтийн хувийг талбарт нь 0–100 хооронд оруулна. Өөрчлөлт таны браузерт (localStorage) хадгалагдана.</span>
+      <span>✏️ <b>Бүх нүдийг</b> дарж шууд засна — Салбар, Үйл ажиллагаа, Шалгуур үзүүлэлт, Суурь/Хүрэх түвшин, Хариуцагч, Хамтран/Хяналт, Тайлбар. Хэрэгжилтийн хувийг 0–100 хооронд оруулна. Enter = хадгалах, Esc = буцаах. Өөрчлөлт таны браузерт (localStorage) хадгалагдана.</span>
       <button id="resetEdits" class="mini-btn">↺ Бүх засварыг цуцлах</button>
       <span id="editCount"></span>
     </div>
@@ -574,18 +572,9 @@ const DATA = RAW.map((r,i)=>{
   const per = parsePeriod(p);
   return {id:i+1, sec, t, p, r:r1, c, n, start:per.start, end:per.end, prog:0,
           sal:sal||"", ind:ind||"", b0:b0||"", tg:tg||"",
-          base:{p, r:r1, c, n, end:per.end}};
+          base:{p, r:r1, c, n, end:per.end, t, sal:sal||"", ind:ind||"", b0:b0||"", tg:tg||""}};
 });
 
-// Харагдах дугаар (`no`) — эх сурвалж, түүний дотор салбар тус бүрд 1-ээс шинээр
-// эхэлнэ (эх баримт бичгүүд ийм дугаарлалттай). `id` нь дотоод, хөндөгдөхгүй.
-(function numberItems(){
-  const seen = {};
-  DATA.forEach(it=>{
-    const k = it.sec + "|" + it.sal;
-    it.no = (seen[k] = (seen[k] || 0) + 1);
-  });
-})();
 
 // ---------- Хэрэглэгчийн засвар (localStorage) ----------
 // Статик сайт тул сервер байхгүй — засварыг зөвхөн тухайн браузерт хадгална.
@@ -625,9 +614,9 @@ function fromISO(s){ const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(s||"")); 
 function applyOverrides(){
   DATA.forEach(it=>{
     const o = OVERRIDES[it.id] || {};
-    it.r = o.r !== undefined ? o.r : it.base.r;
-    it.c = o.c !== undefined ? o.c : it.base.c;
-    it.n = o.n !== undefined ? o.n : it.base.n;
+    ["t","sal","ind","b0","tg","r","c","n"].forEach(f=>{
+      it[f] = o[f] !== undefined ? o[f] : it.base[f];
+    });
     it.prog = clampPct(o.prog ?? 0);
     const dueOv = o.due !== undefined ? fromISO(o.due) : null;
     it.end = dueOv || it.base.end;
@@ -635,6 +624,18 @@ function applyOverrides(){
       : (it.end && it.start.getTime()!==it.end.getTime())
         ? `${fmtMD(it.start)}-${fmtMD(it.end)}` : fmtMD(it.start);
     it.edited = Object.keys(o).length > 0;
+  });
+  numberItems();
+}
+
+// Харагдах дугаар (`no`) — эх сурвалж, түүний дотор салбар тус бүрд 1-ээс шинээр
+// эхэлнэ (эх баримт бичгүүд ийм дугаарлалттай). `id` нь дотоод, хөндөгдөхгүй.
+// Салбарыг гараар засах боломжтой тул засвар хийгдэх бүрд дахин тоологдоно.
+function numberItems(){
+  const seen = {};
+  DATA.forEach(it=>{
+    const k = it.sec + "|" + it.sal;
+    it.no = (seen[k] = (seen[k] || 0) + 1);
   });
 }
 function resetAllEdits(){
@@ -911,11 +912,11 @@ function renderList(){
   body.innerHTML = items.map(it=>`
     <tr>
       <td>${it.no}${it.edited?'<span class="dirty-dot" title="Засварласан"></span>':''}</td>
-      <td class="sal-cell">${it.sal ? `<span class="salpill">${escapeHtml(it.sal)}</span>` : ''}</td>
-      <td class="act-cell">${escapeHtml(it.t)}</td>
-      <td class="ind-cell">${escapeHtml(it.ind)}</td>
-      <td class="lvl">${escapeHtml(it.b0)}</td>
-      <td class="lvl tgt">${escapeHtml(it.tg)}</td>
+      <td class="sal-cell edit" contenteditable="true" data-id="${it.id}" data-f="sal">${escapeHtml(it.sal)}</td>
+      <td class="act-cell edit" contenteditable="true" data-id="${it.id}" data-f="t">${escapeHtml(it.t)}</td>
+      <td class="ind-cell edit" contenteditable="true" data-id="${it.id}" data-f="ind">${escapeHtml(it.ind)}</td>
+      <td class="lvl edit" contenteditable="true" data-id="${it.id}" data-f="b0">${escapeHtml(it.b0)}</td>
+      <td class="lvl tgt edit" contenteditable="true" data-id="${it.id}" data-f="tg">${escapeHtml(it.tg)}</td>
       <td class="resp-cell edit" contenteditable="true" data-id="${it.id}" data-f="r">${escapeHtml(it.r)}</td>
       <td class="ctrl-cell edit" contenteditable="true" data-id="${it.id}" data-f="c">${escapeHtml(it.c)}</td>
       <td class="prog-cell">${progBar(it, true)}<div style="margin-top:4px"><span class="st ${statusOf(it).k}">${statusOf(it).l}</span></div></td>
@@ -1087,10 +1088,12 @@ function renderWeekly(){
     html += `<tr class="salrow"><td colspan="5">${escapeHtml(sal)} `
       + `<span style="font-weight:400;font-size:11.5px">(${list.length} ажил)</span></td><td>${salAvg}%</td></tr>`;
     list.forEach(it=>{
-      html += `<tr><td>${it.no}</td><td class="task">${escapeHtml(it.t)}</td>`
-        + `<td class="ind-cell">${escapeHtml(it.ind)}</td>`
-        + `<td class="lvl">${escapeHtml(it.b0)}</td><td class="lvl tgt">${escapeHtml(it.tg)}</td>`
-        + `<td>${progBar(it,true)}</td></tr>`;
+      html += `<tr><td>${it.no}</td>`
+        + `<td class="task edit" contenteditable="true" data-id="${it.id}" data-f="t">${escapeHtml(it.t)}</td>`
+        + `<td class="ind-cell edit" contenteditable="true" data-id="${it.id}" data-f="ind">${escapeHtml(it.ind)}</td>`
+        + `<td class="lvl edit" contenteditable="true" data-id="${it.id}" data-f="b0">${escapeHtml(it.b0)}</td>`
+        + `<td class="lvl tgt edit" contenteditable="true" data-id="${it.id}" data-f="tg">${escapeHtml(it.tg)}</td>`
+        + `<td>${progBar(it,true)}${it.edited?'<span class="dirty-dot" title="Засварласан"></span>':''}</td></tr>`;
     });
   });
   if(!items.length) html = `<tr><td colspan="6"><div class="empty-note">Шүүлтүүрт тохирох ажил алга.</div></td></tr>`;
