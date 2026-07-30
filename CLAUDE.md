@@ -40,6 +40,7 @@
 | Дэлгэрэнгүй цонх (modal) | `grep -n "function openModal" index.html` |
 | Харагдац солих (tab) | `grep -n "function setView" index.html` |
 | Явцын хүснэгт (7 хоног тутам) | `grep -n "function renderWeekly\|const WEEKS" index.html` |
+| Явцын график (inline SVG) | `grep -n "function lineChart\|renderWeekCharts" index.html` |
 | Салбарын шүүлтүүр | `grep -n "function salList" index.html` |
 | Эх сурвалжийн цэс | `grep -n "function renderSourceBar" index.html` |
 
@@ -51,6 +52,7 @@
 - **Өнгө өөрчлөх бол** `:root`-ийн CSS variable-ийг л засах — тусдаа элементэд hex өнгө шинээр бүү шигтгэ.
 - Хэрэглэгчийн өгөгдлийг (`it.t`, `it.r`, `it.n`...) HTML руу оруулахдаа **үргэлж `escapeHtml()`** ашигла (XSS-с сэргийлэх дадал).
 - Тусдаа `.css`/`.js` файл бүү үүсгэ — нэг файлын энгийн бүтцийг хадгал (deploy хялбар болгоно).
+- **График бол inline SVG-ээр** (`lineChart()`) — Chart.js гэх мэт гадаад сан БҮҮ нэм. Дүрэм: өгөгдлийн марк зөвхөн `var(--accent)` нэг өнгө (light/dark хоёулаа шалгагдсан), grid/тэнхлэг сүүдэрт, 2px шугам, r=4 цэг, бөглөгдөөгүй 7 хоногийг **0 гэж бүү зур** (`null` → цэг тавихгүй). 9 салбарыг нэг тэнхлэгт хольж спагетти бүү болго — салбар тус бүрд жижиг панель (small multiples).
 
 ## 5. Гүйцэтгэлийн баталгаа (Verification loop) — ЗААВАЛ
 Засвар хийсний дараа **дараах нэг коммандыг** ажиллуулж, бүгд ✅ болтол дахин давтана:

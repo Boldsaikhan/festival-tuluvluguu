@@ -153,6 +153,37 @@ table.list tr:hover td{background:var(--main-event)}
 .lvl{font-variant-numeric:tabular-nums; font-weight:600; white-space:nowrap}
 .lvl.tgt{color:var(--accent)}
 
+/* ---------- Явцын график (inline SVG, гадаад сан ашиглахгүй) ---------- */
+.chartbox{background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+  box-shadow:var(--shadow); padding:14px 16px 10px; margin-bottom:14px}
+.chart-head{display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; margin-bottom:8px}
+.chart-title{font-size:13.5px; font-weight:700; color:var(--ink)}
+.chart-sub{font-size:12px; color:var(--ink-soft)}
+.hero-num{font-size:28px; font-weight:800; line-height:1; color:var(--accent);
+  font-variant-numeric:tabular-nums; margin-left:auto}
+.sm-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(226px,1fr)); gap:10px}
+.sm-card{border:1px solid var(--line); border-radius:8px; padding:9px 11px 5px; background:var(--card)}
+.sm-top{display:flex; justify-content:space-between; align-items:baseline; gap:8px; margin-bottom:2px}
+.sm-name{font-size:12px; font-weight:600; color:var(--ink); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.sm-val{font-size:13.5px; font-weight:700; color:var(--accent); font-variant-numeric:tabular-nums; flex:none}
+.sm-val.zero{color:var(--ink-soft)}
+.sm-cnt{font-size:10.5px; color:var(--ink-soft)}
+svg.ch{display:block; width:100%; height:auto; overflow:visible}
+svg.ch .grid{stroke:var(--line); stroke-width:1}
+svg.ch .zero{stroke:var(--line); stroke-width:1.5}
+svg.ch .ax{fill:var(--ink-soft); font-size:9px; font-family:inherit}
+svg.ch .ln{fill:none; stroke:var(--accent); stroke-width:2; stroke-linejoin:round; stroke-linecap:round}
+svg.ch .ar{fill:var(--accent); opacity:.10}
+svg.ch .dot{fill:var(--accent); stroke:var(--card); stroke-width:2}
+svg.ch .hit{fill:transparent}
+svg.ch .hit:hover ~ .cross{opacity:1}
+svg.ch .cross{stroke:var(--accent); stroke-width:1; stroke-dasharray:2 2; opacity:0; pointer-events:none}
+.ch-empty{font-size:12px; color:var(--ink-soft); padding:14px 0 6px; text-align:center}
+.ch-tip{position:fixed; pointer-events:none; z-index:200; display:none; white-space:nowrap;
+  background:var(--card); color:var(--ink); border:1px solid var(--line); border-radius:6px;
+  padding:5px 9px; font-size:12px; box-shadow:0 3px 12px rgba(10,20,50,.18)}
+.ch-tip b{color:var(--accent); font-variant-numeric:tabular-nums}
+
 /* 7 хоног тутмын явцын хүснэгт */
 table.wk{width:100%; border-collapse:collapse; font-size:12.5px; min-width:1150px}
 table.wk th{text-align:center; background:var(--sand-2); padding:7px 8px; font-size:11px; font-weight:600;
@@ -344,6 +375,7 @@ a{color:var(--accent)}
   </section>
 
   <section class="view" id="view-wk">
+    <div id="wkCharts"></div>
     <div class="list-table-wrap"><table class="wk"><thead id="wkHead"></thead><tbody id="wkBody"></tbody></table></div>
     <div style="margin-top:10px; font-size:12px; color:var(--ink-soft)">
       ✏️ 7 хоног тутмын явцын хувийг нүд бүрт оруулна (0–100). Хамгийн сүүлд бөглөсөн 7 хоногийн утга нь ажлын нийт хэрэгжилт болно.
@@ -388,6 +420,8 @@ a{color:var(--accent)}
     <span id="genDate"></span>
   </footer>
 </div>
+
+<div class="ch-tip" id="chTip"></div>
 
 <div class="modal-back" id="modalBack">
   <div class="modal">
@@ -944,8 +978,123 @@ function refreshAfterEdit(full){
 // ---------- Явцын хүснэгт: 7 хоног тутмын хэрэгжилтийн хувь ----------
 function wkLabel(iso){ const d = fromISO(iso); return d ? fmtMD(d) : iso; }
 
+// 7 хоног тус бүрийн дундаж хувь — бөглөгдөөгүй 7 хоног null болно
+function weekAvgs(list){
+  return WEEKS.map(w=>{
+    const vals = list.map(it=>it.w[w]).filter(v=> v!==undefined && v!=="").map(Number);
+    return vals.length ? Math.round(vals.reduce((s,v)=>s+v,0)/vals.length) : null;
+  });
+}
+
+// Нэг хэмжигдэхүүний хугацааны шугаман график. Зөвхөн бөглөсөн 7 хоногт цэг тавина
+// (өгөгдөл байхгүй 7 хоногийг 0 гэж дүрслэхгүй — хоосон нь 0 биш).
+function lineChart(avgs, opts){
+  const o = Object.assign({w:720, h:170, padL:30, padR:12, padT:10, padB:20,
+                           axes:true, name:"Дундаж хэрэгжилт", r:4}, opts||{});
+  const n = WEEKS.length;
+  const iw = o.w - o.padL - o.padR, ih = o.h - o.padT - o.padB;
+  const X = i => o.padL + (n===1 ? iw/2 : i*iw/(n-1));
+  const Y = v => o.padT + (100 - v)/100*ih;
+  const pts = avgs.map((v,i)=> v===null ? null : {i, v, x:X(i), y:Y(v)}).filter(Boolean);
+
+  let s = `<svg class="ch" viewBox="0 0 ${o.w} ${o.h}" role="img" aria-label="${escapeAttr(o.name)}">`;
+  if(o.axes){
+    [0,25,50,75,100].forEach(g=>{
+      s += `<line class="${g===0?'zero':'grid'}" x1="${o.padL}" y1="${Y(g)}" x2="${o.w-o.padR}" y2="${Y(g)}"/>`
+         + `<text class="ax" x="${o.padL-6}" y="${Y(g)+3}" text-anchor="end">${g}%</text>`;
+    });
+    WEEKS.forEach((w,i)=> s += `<text class="ax" x="${X(i)}" y="${o.h-6}" text-anchor="middle">${wkLabel(w)}</text>`);
+  } else {
+    s += `<line class="zero" x1="${o.padL}" y1="${Y(0)}" x2="${o.w-o.padR}" y2="${Y(0)}"/>`
+       + `<line class="grid" x1="${o.padL}" y1="${Y(50)}" x2="${o.w-o.padR}" y2="${Y(50)}"/>`;
+  }
+  if(pts.length){
+    if(pts.length > 1){
+      const d = pts.map((p,k)=> (k?'L':'M')+p.x+' '+p.y).join(' ');
+      s += `<path class="ar" d="${d} L${pts[pts.length-1].x} ${Y(0)} L${pts[0].x} ${Y(0)} Z"/>`
+         + `<path class="ln" d="${d}"/>`;
+    }
+    pts.forEach(p=> s += `<circle class="dot" cx="${p.x}" cy="${p.y}" r="${o.r}"/>`);
+  }
+  // hover: 7 хоног тус бүрийн зурвас (маркаас том hit target) + тэнхлэгийн зураас
+  const bw = iw/(n-1||1);
+  avgs.forEach((v,i)=>{
+    s += `<g><rect class="hit" x="${X(i)-bw/2}" y="${o.padT}" width="${bw}" height="${ih}"`
+       + ` data-lbl="${wkLabel(WEEKS[i])}" data-val="${v===null?'':v}" data-name="${escapeAttr(o.name)}"/>`
+       + `<line class="cross" x1="${X(i)}" y1="${o.padT}" x2="${X(i)}" y2="${o.padT+ih}"/></g>`;
+  });
+  return s + `</svg>`;
+}
+
+function renderWeekCharts(items){
+  const el = document.getElementById("wkCharts");
+  const plan = items.filter(it=> it.sec===2);          // 7 хоногийн явц зөвхөн төлөвлөгөөнд хамаарна
+  const scope = plan.length ? plan : items;
+  const avgs = weekAvgs(scope);
+  const filled = avgs.filter(v=> v!==null);
+  const now = filled.length ? filled[filled.length-1] : 0;
+
+  // салбараар бүлэглэсэн жижиг график (small multiples) — 9 салбарыг нэг тэнхлэгт
+  // хольж спагетти болгохын оронд салбар тус бүрд өөрийн панель
+  const groups = new Map();
+  scope.forEach(it=>{ const k = salList(it)[0]; (groups.get(k) || groups.set(k,[]).get(k)).push(it); });
+  const order = [...groups.keys()].sort((a,b)=> a===UNKNOWN ? 1 : b===UNKNOWN ? -1 : 0);
+
+  el.innerHTML = `
+    <div class="chartbox">
+      <div class="chart-head">
+        <span class="chart-title">Явцын хэрэгжилтийн хувь — нийт дундаж</span>
+        <span class="chart-sub">${scope.length} ажил · 7 хоног тутам · хүрэх түвшин 100%</span>
+        <span class="hero-num">${now}%</span>
+      </div>
+      ${lineChart(avgs, {name:"Нийт дундаж"})}
+      ${filled.length ? '' : `<div class="ch-empty">7 хоногийн явц хараахан бөглөгдөөгүй — доорх хүснэгтэд хувь оруулахад график шууд зурагдана.</div>`}
+    </div>
+    <div class="chartbox">
+      <div class="chart-head">
+        <span class="chart-title">Салбар тус бүрийн явц</span>
+        <span class="chart-sub">бүгд ижил 0–100% тэнхлэгтэй, харьцуулж уншина</span>
+      </div>
+      <div class="sm-grid">
+        ${order.map(sal=>{
+          const list = groups.get(sal);
+          const a = weekAvgs(list);
+          const f = a.filter(v=> v!==null);
+          const cur = f.length ? f[f.length-1] : 0;
+          return `<div class="sm-card">
+            <div class="sm-top">
+              <span class="sm-name" title="${escapeAttr(sal)}">${escapeHtml(sal)}</span>
+              <span class="sm-val ${cur?'':'zero'}">${cur}%</span>
+            </div>
+            <div class="sm-cnt">${list.length} ажил</div>
+            ${lineChart(a, {w:240, h:56, padL:2, padR:2, padT:6, padB:4, axes:false, r:3, name:sal})}
+          </div>`;
+        }).join("")}
+      </div>
+    </div>`;
+
+  wireChartTips(el);
+}
+
+// Нэгдсэн tooltip — hit зурвас дээр хөвүүлэхэд 7 хоног ба хувийг харуулна
+function wireChartTips(root){
+  const tip = document.getElementById("chTip");
+  root.querySelectorAll("svg.ch rect.hit").forEach(r=>{
+    r.addEventListener("mousemove", e=>{
+      const v = r.dataset.val;
+      tip.innerHTML = `${escapeHtml(r.dataset.name)}<br>${escapeHtml(r.dataset.lbl)} — `
+        + (v==="" ? '<span style="opacity:.7">бөглөгдөөгүй</span>' : `<b>${v}%</b>`);
+      tip.style.display = "block";
+      tip.style.left = Math.min(e.clientX + 12, innerWidth - tip.offsetWidth - 8) + "px";
+      tip.style.top  = Math.max(8, e.clientY - tip.offsetHeight - 10) + "px";
+    });
+    r.addEventListener("mouseleave", ()=> tip.style.display = "none");
+  });
+}
+
 function renderWeekly(){
   const items = DATA.filter(matches);
+  renderWeekCharts(items);
   document.getElementById("wkHead").innerHTML =
     `<tr><th>№</th><th class="task">Хэрэгжүүлэх үйл ажиллагаа</th><th>Суурь<br>07.28</th>`
     + WEEKS.map(w=>`<th>${wkLabel(w)}</th>`).join("")
