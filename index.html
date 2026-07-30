@@ -553,6 +553,16 @@ const DATA = RAW.map((r,i)=>{
           base:{p, r:r1, c, n, end:per.end}};
 });
 
+// Харагдах дугаар (`no`) — эх сурвалж, түүний дотор салбар тус бүрд 1-ээс шинээр
+// эхэлнэ (эх баримт бичгүүд ийм дугаарлалттай). `id` нь дотоод, хөндөгдөхгүй.
+(function numberItems(){
+  const seen = {};
+  DATA.forEach(it=>{
+    const k = it.sec + "|" + it.sal;
+    it.no = (seen[k] = (seen[k] || 0) + 1);
+  });
+})();
+
 // ---------- Хэрэглэгчийн засвар (localStorage) ----------
 // Статик сайт тул сервер байхгүй — засварыг зөвхөн тухайн браузерт хадгална.
 const STORE_KEY = "uch_overrides_v1";
@@ -875,7 +885,7 @@ function renderList(){
   const body = document.getElementById("listBody");
   body.innerHTML = items.map(it=>`
     <tr class="${hasDue(it) ? 'urgent' : ''}">
-      <td>${it.id}${it.edited?'<span class="dirty-dot" title="Засварласан"></span>':''}</td>
+      <td>${it.no}${it.edited?'<span class="dirty-dot" title="Засварласан"></span>':''}</td>
       <td class="period-cell">${it.p}</td>
       <td class="sal-cell">${it.sal ? `<span class="salpill">${escapeHtml(it.sal)}</span>` : ''}</td>
       <td class="act-cell">${escapeHtml(it.t)}</td>
@@ -964,7 +974,7 @@ function renderWeekly(){
       + `<td></td>` + avgs.map(a=>`<td>${a===""?"":a+"%"}</td>`).join("")
       + `<td></td><td>${salAvg}%</td></tr>`;
     list.forEach(it=>{
-      html += `<tr><td>${it.id}</td><td class="task">${escapeHtml(it.t)}</td><td class="lvl">${escapeHtml(it.b0)}</td>`
+      html += `<tr><td>${it.no}</td><td class="task">${escapeHtml(it.t)}</td><td class="lvl">${escapeHtml(it.b0)}</td>`
         + WEEKS.map(w=>{
             const v = it.w[w];
             const has = v!==undefined && v!=="";
