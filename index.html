@@ -133,7 +133,7 @@ section.view.active{display:block}
 
 /* ---------- List view ---------- */
 .list-table-wrap{overflow-x:auto; border:1px solid var(--line); border-radius:var(--radius); background:var(--card); box-shadow:var(--shadow)}
-table.list{width:100%; border-collapse:collapse; font-size:12.5px; min-width:1560px}
+table.list{width:100%; border-collapse:collapse; font-size:12.5px; min-width:1290px}
 table.list th{
   text-align:center; background:var(--sand-2); padding:8px 12px; font-size:11.5px;
   font-weight:600; color:var(--ink-soft); position:sticky; top:0; border-bottom:1px solid var(--line);
@@ -143,7 +143,6 @@ table.list tbody tr:nth-child(even) td{background:var(--sand)}
 table.list tr.urgent td{background:var(--urgent-row)}
 table.list tr:hover td{background:var(--main-event)}
 .tag{display:inline-block; padding:2px 8px; border-radius:4px; font-size:10.5px; font-weight:600; color:#fff; white-space:nowrap}
-.period-cell{white-space:nowrap; font-variant-numeric:tabular-nums; font-weight:600; color:var(--accent)}
 .resp-cell{white-space:nowrap}
 .ctrl-cell{white-space:nowrap}
 .sal-cell{min-width:120px}
@@ -161,35 +160,24 @@ table.list tr:hover td{background:var(--main-event)}
 .chart-sub{font-size:12px; color:var(--ink-soft)}
 .hero-num{font-size:28px; font-weight:800; line-height:1; color:var(--accent);
   font-variant-numeric:tabular-nums; margin-left:auto}
-.sm-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(226px,1fr)); gap:10px}
-.sm-card{border:1px solid var(--line); border-radius:8px; padding:9px 11px 5px; background:var(--card);
-  cursor:pointer; transition:border-color .12s, box-shadow .12s}
-.sm-card:hover{border-color:var(--accent-2); box-shadow:0 2px 8px rgba(20,30,60,.10)}
-.sm-card:focus-visible{outline:2px solid var(--accent); outline-offset:1px}
-.sm-card.active{border-color:var(--accent); box-shadow:0 0 0 1px var(--accent) inset}
-.sm-card.active .sm-name{color:var(--accent)}
-.sm-top{display:flex; justify-content:space-between; align-items:baseline; gap:8px; margin-bottom:2px}
-.sm-name{font-size:12px; font-weight:600; color:var(--ink); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
-.sm-val{font-size:13.5px; font-weight:700; color:var(--accent); font-variant-numeric:tabular-nums; flex:none}
-.sm-val.zero{color:var(--ink-soft)}
-.sm-cnt{font-size:10.5px; color:var(--ink-soft)}
+.prog-bar.big{height:12px; border-radius:6px}
 svg.ch{display:block; width:100%; height:auto; overflow:visible}
 svg.ch .grid{stroke:var(--line); stroke-width:1}
 svg.ch .zero{stroke:var(--line); stroke-width:1.5}
 svg.ch .ax{fill:var(--ink-soft); font-size:9px; font-family:inherit}
-svg.ch .ln{fill:none; stroke:var(--accent); stroke-width:2; stroke-linejoin:round; stroke-linecap:round}
-svg.ch .ar{fill:var(--accent); opacity:.10}
-svg.ch .dot{fill:var(--accent); stroke:var(--card); stroke-width:2}
+svg.ch .trk{fill:var(--sand-2); stroke:var(--line); stroke-width:1}
+svg.ch .bar{fill:var(--accent)}
+svg.ch .lbl{font-size:11px}
+svg.ch .val{fill:var(--ink); font-size:11px; font-weight:700; font-family:inherit; font-variant-numeric:tabular-nums}
 svg.ch .hit{fill:transparent}
-svg.ch .hit:hover ~ .cross{opacity:1}
-svg.ch .cross{stroke:var(--accent); stroke-width:1; stroke-dasharray:2 2; opacity:0; pointer-events:none}
+svg.ch .hit:hover{fill:var(--accent); fill-opacity:.06}
 .ch-empty{font-size:12px; color:var(--ink-soft); padding:14px 0 6px; text-align:center}
 .ch-tip{position:fixed; pointer-events:none; z-index:200; display:none; white-space:nowrap;
   background:var(--card); color:var(--ink); border:1px solid var(--line); border-radius:6px;
   padding:5px 9px; font-size:12px; box-shadow:0 3px 12px rgba(10,20,50,.18)}
 .ch-tip b{color:var(--accent); font-variant-numeric:tabular-nums}
 
-/* 7 хоног тутмын явцын хүснэгт */
+/* Графикийн доорх хэрэгжилтийн хүснэгт */
 table.wk{width:100%; border-collapse:collapse; font-size:12.5px; min-width:1150px}
 table.wk th{text-align:center; background:var(--sand-2); padding:7px 8px; font-size:11px; font-weight:600;
   color:var(--ink-soft); position:sticky; top:0; border-bottom:1px solid var(--line); white-space:nowrap}
@@ -383,8 +371,7 @@ a{color:var(--accent)}
     <div id="wkCharts"></div>
     <div class="list-table-wrap"><table class="wk"><thead id="wkHead"></thead><tbody id="wkBody"></tbody></table></div>
     <div style="margin-top:10px; font-size:12px; color:var(--ink-soft)">
-      ✏️ 7 хоног тутмын явцын хувийг нүд бүрт оруулна (0–100). Хамгийн сүүлд бөглөсөн 7 хоногийн утга нь ажлын нийт хэрэгжилт болно.
-      Салбар бүрийн мөрөнд тухайн 7 хоногийн <b>дундаж хэрэгжилт</b> харагдана.
+      ✏️ Хэрэгжилтийн хувийг ажил тус бүрд 0–100 хооронд оруулна. Салбарын мөрөнд тухайн салбарын <b>дундаж хэрэгжилт</b>, дээрх графикт нийт болон салбарын хэрэгжилт шууд шинэчлэгдэнэ.
     </div>
   </section>
 
@@ -405,16 +392,16 @@ a{color:var(--accent)}
     <div class="list-table-wrap">
       <table class="list">
         <thead><tr>
-          <th>№</th><th>Огноо</th><th class="sal-cell">Салбар</th><th class="act-cell">Үүрэг, чиглэл / Ажил</th>
-          <th class="ind-cell">Шалгуур үзүүлэлт,<br>хэмжих нэгж</th><th>Суурь</th><th>Хүрэх</th>
-          <th>Үндсэн хэрэгжүүлэгч</th><th class="ctrl-cell">Хамтран / Хяналт</th><th class="ctrl-cell">Гүйцэтгэх хугацаа</th>
+          <th>№</th><th class="sal-cell">Салбар</th><th class="act-cell">Үүрэг, чиглэл / Ажил</th>
+          <th class="ind-cell">Шалгуур үзүүлэлт,<br>хэмжих нэгж</th><th>Суурь<br>түвшин</th><th>Хүрэх<br>түвшин</th>
+          <th>Үндсэн хэрэгжүүлэгч</th><th class="ctrl-cell">Хамтран / Хяналт</th>
           <th class="prog-cell">Хэрэгжилт</th><th class="note-cell">Тайлбар</th>
         </tr></thead>
         <tbody id="listBody"></tbody>
       </table>
     </div>
     <div style="margin-top:10px; display:flex; gap:10px; align-items:center; flex-wrap:wrap; font-size:12px; color:var(--ink-soft)">
-      <span>✏️ Хариуцагч, Хамтран/Хяналт, Тайлбар нүдийг дарж шууд засна. Гүйцэтгэх хугацаа, Хэрэгжилтийн хувийг талбарт нь оруулна (7 хоногийн явц бөглөсөн ажлын хувь автоматаар тодорхойлогддог тул засагдахгүй). Өөрчлөлт таны браузерт (localStorage) хадгалагдана.</span>
+      <span>✏️ Хариуцагч, Хамтран/Хяналт, Тайлбар нүдийг дарж шууд засна. Хэрэгжилтийн хувийг талбарт нь 0–100 хооронд оруулна. Өөрчлөлт таны браузерт (localStorage) хадгалагдана.</span>
       <button id="resetEdits" class="mini-btn">↺ Бүх засварыг цуцлах</button>
       <span id="editCount"></span>
     </div>
@@ -433,8 +420,6 @@ a{color:var(--accent)}
     <span class="tag modal-tag" id="mTag"></span>
     <h3 id="mTitle"></h3>
     <dl>
-      <dt>Хугацаа</dt><dd id="mPeriod"></dd>
-      <dt>Гүйцэтгэх хугацаа</dt><dd id="mDue"></dd>
       <dt>Хэрэгжилт</dt><dd id="mProg"></dd>
       <dt>Хариуцагч</dt><dd id="mResp"></dd>
       <dt>Хяналт тавих</dt><dd id="mCollab"></dd>
@@ -609,15 +594,22 @@ let OVERRIDES = {};
 try{ OVERRIDES = JSON.parse(localStorage.getItem(STORE_KEY) || "{}") || {}; }catch(e){ OVERRIDES = {}; }
 function saveOverrides(){ try{ localStorage.setItem(STORE_KEY, JSON.stringify(OVERRIDES)); }catch(e){} }
 function clampPct(v){ return Math.max(0, Math.min(100, Number(v) || 0)); }
-// 7 хоногийн явцын хувийг хадгалах (хоосон бол устгана)
-function setWeek(id, wk, value){
-  const o = OVERRIDES[id] || (OVERRIDES[id] = {});
-  const w = o.w || (o.w = {});
-  if(value === "" || value === null) delete w[wk]; else w[wk] = clampPct(value);
-  if(!Object.keys(w).length) delete o.w;
-  if(!Object.keys(o).length) delete OVERRIDES[id];
-  saveOverrides(); applyOverrides();
-}
+
+// Хуучин хувилбарын 7 хоног тутмын явц (`o.w`) устгагдсан — хэрэв хадгалагдсан
+// байвал сүүлийн утгыг нэг удаа `prog` болгож шилжүүлээд массивыг цэвэрлэнэ.
+(function migrateWeekly(){
+  let touched = false;
+  Object.keys(OVERRIDES).forEach(id=>{
+    const o = OVERRIDES[id];
+    if(o && o.w){
+      const vals = Object.keys(o.w).sort().map(k=>o.w[k]).filter(v=> v!==undefined && v!=="");
+      if(vals.length && o.prog === undefined) o.prog = clampPct(vals[vals.length-1]);
+      delete o.w; touched = true;
+      if(!Object.keys(o).length) delete OVERRIDES[id];
+    }
+  });
+  if(touched) saveOverrides();
+})();
 function setOverride(id, field, value){
   const o = OVERRIDES[id] || (OVERRIDES[id] = {});
   const it = DATA.find(d=>d.id===id);
@@ -636,12 +628,7 @@ function applyOverrides(){
     it.r = o.r !== undefined ? o.r : it.base.r;
     it.c = o.c !== undefined ? o.c : it.base.c;
     it.n = o.n !== undefined ? o.n : it.base.n;
-    // 7 хоног тутмын явцын хувь. Хэрэв бөглөсөн бол хамгийн сүүлийн бөглөсөн
-    // 7 хоногийн утга нь ажлын нийт хэрэгжилт болно (гараар оруулсныг дарж бичнэ).
-    it.w = Object.assign({}, o.w || {});
-    const filled = WEEKS.filter(wk=> it.w[wk] !== undefined && it.w[wk] !== "");
-    it.prog = filled.length ? clampPct(it.w[filled[filled.length-1]])
-                            : clampPct(o.prog ?? 0);
+    it.prog = clampPct(o.prog ?? 0);
     const dueOv = o.due !== undefined ? fromISO(o.due) : null;
     it.end = dueOv || it.base.end;
     it.p = !it.start ? it.base.p
@@ -671,9 +658,6 @@ function inRange(d,s,e){ return d>=new Date(s.getFullYear(),s.getMonth(),s.getDa
 function occursOnDay(it,date){ return it.start && (sameDay(date,it.start) || (it.end && sameDay(date,it.end))); }
 // хурлын өдрүүд — эх сурвалж болсон огноо
 const MEETING_DATES = [new Date(YEAR,6,9), new Date(YEAR,6,28)];
-// Өвөлжилтийн бэлтгэлийн төлөвлөгөөний "Явцын хэрэгжилтийн хувь" 7 хоног тутмын тайлант огноонууд
-const WEEKS = ["2026-08-03","2026-08-10","2026-08-17","2026-08-24","2026-08-31",
-               "2026-09-07","2026-09-14","2026-09-21","2026-09-28"];
 function isMeetingDay(d){ return MEETING_DATES.some(m=>sameDay(m,d)); }
 // тодорхой эцсийн хугацаатай (start !== end) үүрэг чиглэлийн дуусах өдрүүд
 // (гүйцэтгэх хугацааг засварлаж болдог тул тогтмол биш, дуудах бүрд шинэчлэгдэнэ)
@@ -690,14 +674,11 @@ function statusOf(it){
   if(it.prog > 0) return {k:"doing", l:"Хэрэгжиж байна"};
   return {k:"none", l:"Эхлээгүй"};
 }
-// 7 хоногийн явц бөглөгдсөн бол нийт хувь тэднээс гардаг тул гараар засах боломжгүй
-function hasWeekly(it){ return WEEKS.some(w=> it.w && it.w[w] !== undefined && it.w[w] !== ""); }
 function progBar(it, editable){
   const st = statusOf(it);
-  if(editable && hasWeekly(it)) editable = false;
   const num = editable
     ? `<input class="prog-num" type="number" min="0" max="100" step="5" value="${it.prog}" data-id="${it.id}" title="Хэрэгжилтийн хувь"><span class="pct">%</span>`
-    : `<span class="prog-num" ${hasWeekly(it)?'title="7 хоногийн явцаас автоматаар"':''}>${it.prog}%</span>`;
+    : `<span class="prog-num">${it.prog}%</span>`;
   return `<div class="prog" title="${st.l}">
       <div class="prog-bar"><div class="prog-fill ${st.k==='done'?'done':st.k==='late'?'late':''}" style="width:${it.prog}%"></div></div>
       ${num}
@@ -706,7 +687,7 @@ function progBar(it, editable){
 
 // ---------- filtering ----------
 let currentFilter = {q:"", sec:""};
-let dueOnly = false;      // "Хугацаа дөхсөн" төлөв идэвхтэй эсэх
+let doneOnly = false;     // "Хэрэгжсэн" (100%) төлөв идэвхтэй эсэх
 let salFilter = "";      // сонгосон салбар
 let respFilter = "";      // сонгосон хариуцагч
 let openGroup = null;     // null | 'sal' | 'resp' — дэд шүүлтүүрийн мөр нээлттэй эсэх
@@ -718,7 +699,7 @@ function hasDue(it){ return !!(it.start && it.end && it.start.getTime()!==it.end
 function matchesBase(item, useSal){
   const q = currentFilter.q.trim().toLowerCase();
   if(currentFilter.sec && String(item.sec)!==currentFilter.sec) return false;
-  if(dueOnly && !hasDue(item)) return false;
+  if(doneOnly && item.prog < 100) return false;
   if(useSal && salFilter && !salList(item).includes(salFilter)) return false;
   if(respFilter && !(respFilter===UNKNOWN ? respList(item).length===0 : respList(item).includes(respFilter))) return false;
   if(!q) return true;
@@ -748,13 +729,14 @@ function renderStats(){
   const el = document.getElementById("stats");
   const sals = groupCounts('sal');
   const resps = groupCounts('resp');
-  const dueCount = DATA.filter(hasDue).length;
-  const noFilter = !dueOnly && !salFilter && !respFilter;
+  const doneCount = DATA.filter(d=>d.prog>=100).length;
+  const avgAll = DATA.length ? Math.round(DATA.reduce((a,d)=>a+d.prog,0)/DATA.length) : 0;
+  const noFilter = !doneOnly && !salFilter && !respFilter;
   const cards = [
     {key:"all",  ic:"📁", n:DATA.length,   l:"Нийт",           on:noFilter},
     {key:"sal", ic:"🏢", n:sals.length,  l:salFilter || "Салбар",      on:!!salFilter || openGroup==='sal'},
     {key:"resp", ic:"👤", n:resps.length,  l:respFilter || "Хариуцагч",   on:!!respFilter || openGroup==='resp'},
-    {key:"due",  ic:"⏰", n:dueCount,      l:"Хугацаа дөхсөн", on:dueOnly},
+    {key:"done", ic:"✅", n:doneCount+" / "+avgAll+"%", l:"Хэрэгжсэн · дундаж", on:doneOnly},
   ];
   el.innerHTML = cards.map(c=>`
     <div class="stat ${c.on?'active':''}" data-key="${c.key}">
@@ -762,8 +744,8 @@ function renderStats(){
     </div>`).join("");
   el.querySelectorAll(".stat").forEach(c=> c.addEventListener("click", ()=>{
     const key = c.dataset.key;
-    if(key==="all"){ dueOnly=false; salFilter=""; respFilter=""; openGroup=null; }
-    else if(key==="due"){ dueOnly = !dueOnly; openGroup=null; }
+    if(key==="all"){ doneOnly=false; salFilter=""; respFilter=""; openGroup=null; }
+    else if(key==="done"){ doneOnly = !doneOnly; openGroup=null; }
     else openGroup = (openGroup===key) ? null : key;   // sal | resp — дэд мөр нээх/хаах
     renderStats(); renderSubStats(); renderAll();
   }));
@@ -927,9 +909,8 @@ function renderList(){
   const items = DATA.filter(matches).slice().sort((a,b)=> (a.start-b.start) || (a.sec-b.sec));
   const body = document.getElementById("listBody");
   body.innerHTML = items.map(it=>`
-    <tr class="${hasDue(it) ? 'urgent' : ''}">
+    <tr>
       <td>${it.no}${it.edited?'<span class="dirty-dot" title="Засварласан"></span>':''}</td>
-      <td class="period-cell">${it.p}</td>
       <td class="sal-cell">${it.sal ? `<span class="salpill">${escapeHtml(it.sal)}</span>` : ''}</td>
       <td class="act-cell">${escapeHtml(it.t)}</td>
       <td class="ind-cell">${escapeHtml(it.ind)}</td>
@@ -937,7 +918,6 @@ function renderList(){
       <td class="lvl tgt">${escapeHtml(it.tg)}</td>
       <td class="resp-cell edit" contenteditable="true" data-id="${it.id}" data-f="r">${escapeHtml(it.r)}</td>
       <td class="ctrl-cell edit" contenteditable="true" data-id="${it.id}" data-f="c">${escapeHtml(it.c)}</td>
-      <td class="ctrl-cell"><input class="cell-date" type="date" value="${toISO(it.end)}" data-id="${it.id}" title="Хийж гүйцэтгэх эцсийн хугацаа"></td>
       <td class="prog-cell">${progBar(it, true)}<div style="margin-top:4px"><span class="st ${statusOf(it).k}">${statusOf(it).l}</span></div></td>
       <td class="note-cell edit" contenteditable="true" data-id="${it.id}" data-f="n">${escapeHtml(it.n)}</td>
     </tr>`).join("");
@@ -984,132 +964,102 @@ function refreshAfterEdit(full){
   }
 }
 
-// ---------- Явцын хүснэгт: 7 хоног тутмын хэрэгжилтийн хувь ----------
-function wkLabel(iso){ const d = fromISO(iso); return d ? fmtMD(d) : iso; }
-
-// 7 хоног тус бүрийн дундаж хувь — бөглөгдөөгүй 7 хоног null болно
-function weekAvgs(list){
-  return WEEKS.map(w=>{
-    const vals = list.map(it=>it.w[w]).filter(v=> v!==undefined && v!=="").map(Number);
-    return vals.length ? Math.round(vals.reduce((s,v)=>s+v,0)/vals.length) : null;
+// ---------- График: хэрэгжилтийн хувь (хугацааны тэнхлэггүй) ----------
+// Хэмжигдэхүүн нь ялгаа биш ХЭМЖЭЭ тул хэвтээ багана (bar) — 0-ээс эхэлсэн нэг
+// суурьтай, нэг өнгөтэй, утга нь маркийн хажууд шууд бичигдэнэ.
+function barChart(rows, opts){
+  const o = Object.assign({w:720, rowH:26, padL:170, padR:44, padT:4}, opts||{});
+  const h = o.padT + rows.length*o.rowH + 4;
+  const iw = o.w - o.padL - o.padR;
+  const bh = 11;
+  let s = `<svg class="ch" viewBox="0 0 ${o.w} ${h}" role="img" aria-label="Хэрэгжилтийн хувь">`;
+  // 0/25/50/75/100% сүүдэрт торон шугам
+  [0,25,50,75,100].forEach(g=>{
+    const x = o.padL + iw*g/100;
+    s += `<line class="${g===0?'zero':'grid'}" x1="${x}" y1="${o.padT}" x2="${x}" y2="${o.padT+rows.length*o.rowH}"/>`;
   });
-}
-
-// Нэг хэмжигдэхүүний хугацааны шугаман график. Зөвхөн бөглөсөн 7 хоногт цэг тавина
-// (өгөгдөл байхгүй 7 хоногийг 0 гэж дүрслэхгүй — хоосон нь 0 биш).
-function lineChart(avgs, opts){
-  const o = Object.assign({w:720, h:170, padL:30, padR:12, padT:10, padB:20,
-                           axes:true, name:"Дундаж хэрэгжилт", r:4}, opts||{});
-  const n = WEEKS.length;
-  const iw = o.w - o.padL - o.padR, ih = o.h - o.padT - o.padB;
-  const X = i => o.padL + (n===1 ? iw/2 : i*iw/(n-1));
-  const Y = v => o.padT + (100 - v)/100*ih;
-  const pts = avgs.map((v,i)=> v===null ? null : {i, v, x:X(i), y:Y(v)}).filter(Boolean);
-
-  let s = `<svg class="ch" viewBox="0 0 ${o.w} ${o.h}" role="img" aria-label="${escapeAttr(o.name)}">`;
-  if(o.axes){
-    [0,25,50,75,100].forEach(g=>{
-      s += `<line class="${g===0?'zero':'grid'}" x1="${o.padL}" y1="${Y(g)}" x2="${o.w-o.padR}" y2="${Y(g)}"/>`
-         + `<text class="ax" x="${o.padL-6}" y="${Y(g)+3}" text-anchor="end">${g}%</text>`;
-    });
-    WEEKS.forEach((w,i)=> s += `<text class="ax" x="${X(i)}" y="${o.h-6}" text-anchor="middle">${wkLabel(w)}</text>`);
-  } else {
-    s += `<line class="zero" x1="${o.padL}" y1="${Y(0)}" x2="${o.w-o.padR}" y2="${Y(0)}"/>`
-       + `<line class="grid" x1="${o.padL}" y1="${Y(50)}" x2="${o.w-o.padR}" y2="${Y(50)}"/>`;
-  }
-  if(pts.length){
-    if(pts.length > 1){
-      const d = pts.map((p,k)=> (k?'L':'M')+p.x+' '+p.y).join(' ');
-      s += `<path class="ar" d="${d} L${pts[pts.length-1].x} ${Y(0)} L${pts[0].x} ${Y(0)} Z"/>`
-         + `<path class="ln" d="${d}"/>`;
-    }
-    pts.forEach(p=> s += `<circle class="dot" cx="${p.x}" cy="${p.y}" r="${o.r}"/>`);
-  }
-  // hover: 7 хоног тус бүрийн зурвас (маркаас том hit target) + тэнхлэгийн зураас
-  const bw = iw/(n-1||1);
-  avgs.forEach((v,i)=>{
-    s += `<g><rect class="hit" x="${X(i)-bw/2}" y="${o.padT}" width="${bw}" height="${ih}"`
-       + ` data-lbl="${wkLabel(WEEKS[i])}" data-val="${v===null?'':v}" data-name="${escapeAttr(o.name)}"/>`
-       + `<line class="cross" x1="${X(i)}" y1="${o.padT}" x2="${X(i)}" y2="${o.padT+ih}"/></g>`;
+  rows.forEach((r,i)=>{
+    const y = o.padT + i*o.rowH + (o.rowH-bh)/2;
+    const w = Math.max(0, iw*clampPct(r.v)/100);
+    s += `<text class="ax lbl" x="${o.padL-8}" y="${y+bh-1.5}" text-anchor="end">${escapeHtml(r.name)}</text>`
+       + `<rect class="trk" x="${o.padL}" y="${y}" width="${iw}" height="${bh}" rx="4"/>`
+       + (w>0 ? `<rect class="bar" x="${o.padL}" y="${y}" width="${w}" height="${bh}" rx="4"/>` : '')
+       + `<text class="val" x="${o.padL+iw+6}" y="${y+bh-1.5}">${clampPct(r.v)}%</text>`
+       + `<rect class="hit" x="${o.padL}" y="${o.padT+i*o.rowH}" width="${iw}" height="${o.rowH}"`
+       + ` data-lbl="${escapeAttr(r.name)}" data-val="${clampPct(r.v)}" data-name="${escapeAttr(r.sub||'')}"/>`;
   });
   return s + `</svg>`;
 }
 
-function renderWeekCharts(items){
+function renderProgress(){
   const el = document.getElementById("wkCharts");
-  const plan = items.filter(it=> it.sec===2);          // 7 хоногийн явц зөвхөн төлөвлөгөөнд хамаарна
-  const scope = plan.length ? plan : items;
-  const avgs = weekAvgs(scope);
-  const filled = avgs.filter(v=> v!==null);
-  const now = filled.length ? filled[filled.length-1] : 0;
+  const items = DATA.filter(matches);
+  const avg = items.length ? Math.round(items.reduce((a,d)=>a+d.prog,0)/items.length) : 0;
+  const done = items.filter(d=>d.prog>=100).length;
+  const started = items.filter(d=>d.prog>0 && d.prog<100).length;
 
-  // салбараар бүлэглэсэн жижиг график (small multiples) — 9 салбарыг нэг тэнхлэгт
-  // хольж спагетти болгохын оронд салбар тус бүрд өөрийн панель
-  // Панелиуд салбарын шүүлтүүрээс хамаарахгүй (сонгосны дараа ч бүгд харагдана)
-  const panelScope = DATA.filter(matchesNoSal).filter(it=> it.sec===2 || plan.length===0);
+  // салбарын багана нь салбарын шүүлтүүрээс хамаарахгүй (сонгосны дараа ч бүгд харагдана)
   const groups = new Map();
-  panelScope.forEach(it=>{ const k = salList(it)[0]; (groups.get(k) || groups.set(k,[]).get(k)).push(it); });
+  DATA.filter(matchesNoSal).forEach(it=>{
+    const k = salList(it)[0]; (groups.get(k) || groups.set(k,[]).get(k)).push(it);
+  });
   const order = [...groups.keys()].sort((a,b)=> a===UNKNOWN ? 1 : b===UNKNOWN ? -1 : 0);
+  const salRows = order.map(sal=>{
+    const list = groups.get(sal);
+    return {name:`${sal} (${list.length})`, sal,
+            v: Math.round(list.reduce((a,d)=>a+d.prog,0)/list.length),
+            sub:`${list.length} ажил`};
+  });
 
   el.innerHTML = `
     <div class="chartbox">
       <div class="chart-head">
-        <span class="chart-title">Явцын хэрэгжилтийн хувь — ${salFilter ? escapeHtml(salFilter) : "нийт дундаж"}</span>
-        <span class="chart-sub">${scope.length} ажил · 7 хоног тутам · хүрэх түвшин 100%</span>
+        <span class="chart-title">Хэрэгжилтийн хувь — ${salFilter ? escapeHtml(salFilter) : "нийт дундаж"}</span>
+        <span class="chart-sub">${items.length} ажил · ${done} хэрэгжсэн · ${started} хэрэгжиж байна · хүрэх түвшин 100%</span>
         ${salFilter ? `<button class="mini-btn" id="salClear">✕ ${escapeHtml(salFilter)} — шүүлтүүр цуцлах</button>` : ''}
-        <span class="hero-num">${now}%</span>
+        <span class="hero-num">${avg}%</span>
       </div>
-      ${lineChart(avgs, {name: salFilter || "Нийт дундаж"})}
-      ${filled.length ? '' : `<div class="ch-empty">7 хоногийн явц хараахан бөглөгдөөгүй — доорх хүснэгтэд хувь оруулахад график шууд зурагдана.</div>`}
+      <div class="prog-bar big"><div class="prog-fill ${avg>=100?'done':''}" style="width:${avg}%"></div></div>
     </div>
     <div class="chartbox">
       <div class="chart-head">
-        <span class="chart-title">Салбар тус бүрийн явц</span>
-        <span class="chart-sub">бүгд ижил 0–100% тэнхлэгтэй · <b>салбар дээр дарж</b> тухайн салбарын үйл ажиллагааг шүүнэ</span>
+        <span class="chart-title">Салбар тус бүрийн хэрэгжилт</span>
+        <span class="chart-sub">салбарын дундаж хувь · <b>салбар дээр дарж</b> тухайн салбарын үйл ажиллагааг шүүнэ</span>
       </div>
-      <div class="sm-grid">
-        ${order.map(sal=>{
-          const list = groups.get(sal);
-          const a = weekAvgs(list);
-          const f = a.filter(v=> v!==null);
-          const cur = f.length ? f[f.length-1] : 0;
-          return `<div class="sm-card ${salFilter===sal?'active':''}" data-sal="${escapeAttr(sal)}"
-                       role="button" tabindex="0" title="${escapeAttr(sal)} — дарж шүүх">
-            <div class="sm-top">
-              <span class="sm-name">${escapeHtml(sal)}</span>
-              <span class="sm-val ${cur?'':'zero'}">${cur}%</span>
-            </div>
-            <div class="sm-cnt">${list.length} ажил</div>
-            ${lineChart(a, {w:240, h:56, padL:2, padR:2, padT:6, padB:4, axes:false, r:3, name:sal})}
-          </div>`;
-        }).join("")}
+      ${barChart(salRows, {w:760})}
+    </div>
+    <div class="chartbox">
+      <div class="chart-head">
+        <span class="chart-title">Үйл ажиллагаа тус бүрийн хэрэгжилт</span>
+        <span class="chart-sub">${items.length} ажил${salFilter?" · "+escapeHtml(salFilter):""}</span>
       </div>
+      ${items.length
+        ? barChart(items.map(it=>({name:`${it.no}. ${truncate(it.t, 44)}`, v:it.prog, sub:it.sal||sectionName(it.sec)})), {w:900, rowH:22, padL:290})
+        : `<div class="ch-empty">Шүүлтүүрт тохирох ажил алга.</div>`}
     </div>`;
 
-  // салбарын панель дээр дарахад тухайн салбараар шүүнэ (дахин дарвал цуцлагдана)
   const pick = sal =>{
     salFilter = (salFilter===sal) ? "" : sal;
     openGroup = null;
     renderStats(); renderSubStats(); renderAll();
   };
-  el.querySelectorAll(".sm-card").forEach(c=>{
-    c.addEventListener("click", ()=> pick(c.dataset.sal));
-    c.addEventListener("keydown", e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); pick(c.dataset.sal); } });
-  });
+  // зөвхөн салбарын графикийн зурвасууд шүүлтүүр солино (2 дахь chartbox)
+  const salSvg = el.querySelectorAll(".chartbox")[1].querySelectorAll("rect.hit");
+  salSvg.forEach((r,i)=> r.addEventListener("click", ()=> pick(salRows[i].sal)));
+  salSvg.forEach(r=> r.style.cursor = "pointer");
   const clr = document.getElementById("salClear");
   if(clr) clr.addEventListener("click", ()=> pick(salFilter));
 
   wireChartTips(el);
 }
 
-// Нэгдсэн tooltip — hit зурвас дээр хөвүүлэхэд 7 хоног ба хувийг харуулна
+// Нэгдсэн tooltip — зурвас дээр хөвүүлэхэд нэр ба хувийг харуулна
 function wireChartTips(root){
   const tip = document.getElementById("chTip");
   root.querySelectorAll("svg.ch rect.hit").forEach(r=>{
     r.addEventListener("mousemove", e=>{
-      const v = r.dataset.val;
-      tip.innerHTML = `${escapeHtml(r.dataset.name)}<br>${escapeHtml(r.dataset.lbl)} — `
-        + (v==="" ? '<span style="opacity:.7">бөглөгдөөгүй</span>' : `<b>${v}%</b>`);
+      tip.innerHTML = `${escapeHtml(r.dataset.lbl)}<br>Хэрэгжилт — <b>${r.dataset.val}%</b>`
+        + (r.dataset.name ? `<br><span style="opacity:.7">${escapeHtml(r.dataset.name)}</span>` : '');
       tip.style.display = "block";
       tip.style.left = Math.min(e.clientX + 12, innerWidth - tip.offsetWidth - 8) + "px";
       tip.style.top  = Math.max(8, e.clientY - tip.offsetHeight - 10) + "px";
@@ -1118,54 +1068,35 @@ function wireChartTips(root){
   });
 }
 
+// Графикийн доорх хүснэгт — хугацааны багана байхгүй, хэрэгжилтийн хувь бөглөнө
 function renderWeekly(){
   const items = DATA.filter(matches);
-  renderWeekCharts(items);
+  renderProgress();
   document.getElementById("wkHead").innerHTML =
-    `<tr><th>№</th><th class="task">Хэрэгжүүлэх үйл ажиллагаа</th><th>Суурь<br>07.28</th>`
-    + WEEKS.map(w=>`<th>${wkLabel(w)}</th>`).join("")
-    + `<th>Хүрэх<br>09.28</th><th>Хэрэгжилт</th></tr>`;
+    `<tr><th>№</th><th class="task">Хэрэгжүүлэх үйл ажиллагаа</th>`
+    + `<th>Шалгуур үзүүлэлт</th><th>Суурь<br>түвшин</th><th>Хүрэх<br>түвшин</th><th>Хэрэгжилт</th></tr>`;
 
-  // салбараар бүлэглэнэ (салбаргүй бол "Тодорхойгүй" хамгийн доор)
   const groups = new Map();
-  items.forEach(it=>{
-    const k = salList(it)[0];
-    if(!groups.has(k)) groups.set(k, []);
-    groups.get(k).push(it);
-  });
+  items.forEach(it=>{ const k = salList(it)[0]; (groups.get(k) || groups.set(k,[]).get(k)).push(it); });
   const order = [...groups.keys()].sort((a,b)=> a===UNKNOWN ? 1 : b===UNKNOWN ? -1 : 0);
 
-  const colspan = 3 + WEEKS.length + 2;
   let html = "";
   order.forEach(sal=>{
     const list = groups.get(sal);
-    // салбарын мөр: 7 хоног тус бүрийн дундаж (бөглөсөн нүднүүдээр)
-    const avgs = WEEKS.map(w=>{
-      const vals = list.map(it=>it.w[w]).filter(v=> v!==undefined && v!=="");
-      return vals.length ? Math.round(vals.reduce((s,v)=>s+Number(v),0)/vals.length) : "";
-    });
     const salAvg = Math.round(list.reduce((s,it)=>s+it.prog,0)/list.length);
-    html += `<tr class="salrow"><td colspan="2">${escapeHtml(sal)} <span style="font-weight:400;font-size:11.5px">(${list.length} ажил)</span></td>`
-      + `<td></td>` + avgs.map(a=>`<td>${a===""?"":a+"%"}</td>`).join("")
-      + `<td></td><td>${salAvg}%</td></tr>`;
+    html += `<tr class="salrow"><td colspan="5">${escapeHtml(sal)} `
+      + `<span style="font-weight:400;font-size:11.5px">(${list.length} ажил)</span></td><td>${salAvg}%</td></tr>`;
     list.forEach(it=>{
-      html += `<tr><td>${it.no}</td><td class="task">${escapeHtml(it.t)}</td><td class="lvl">${escapeHtml(it.b0)}</td>`
-        + WEEKS.map(w=>{
-            const v = it.w[w];
-            const has = v!==undefined && v!=="";
-            return `<td><input class="wk-in ${has?'has':''}" type="number" min="0" max="100" step="5"
-              value="${has?v:''}" data-id="${it.id}" data-w="${w}" title="${wkLabel(w)} — явцын хэрэгжилтийн хувь"></td>`;
-          }).join("")
-        + `<td class="lvl tgt">${escapeHtml(it.tg)}</td><td>${progBar(it,false)}</td></tr>`;
+      html += `<tr><td>${it.no}</td><td class="task">${escapeHtml(it.t)}</td>`
+        + `<td class="ind-cell">${escapeHtml(it.ind)}</td>`
+        + `<td class="lvl">${escapeHtml(it.b0)}</td><td class="lvl tgt">${escapeHtml(it.tg)}</td>`
+        + `<td>${progBar(it,true)}</td></tr>`;
     });
   });
-  if(!items.length) html = `<tr><td colspan="${colspan}"><div class="empty-note">Шүүлтүүрт тохирох ажил алга.</div></td></tr>`;
+  if(!items.length) html = `<tr><td colspan="6"><div class="empty-note">Шүүлтүүрт тохирох ажил алга.</div></td></tr>`;
   const body = document.getElementById("wkBody");
   body.innerHTML = html;
-  body.querySelectorAll("input.wk-in").forEach(inp=> inp.addEventListener("change", ()=>{
-    setWeek(+inp.dataset.id, inp.dataset.w, inp.value.trim());
-    renderStats(); renderSubStats(); renderAll();
-  }));
+  wireEditors(body);
 }
 
 // ---------- Хэрэгжилтийн харагдац (өдөр / 7 хоног / сар) ----------
@@ -1250,8 +1181,6 @@ function openModal(id){
   document.getElementById("mTag").textContent = `${it.sec}. ${sectionName(it.sec)}`;
   document.getElementById("mTag").style.background = sectionColor(it.sec);
   document.getElementById("mTitle").textContent = it.t;
-  document.getElementById("mPeriod").textContent = it.p + (it.start? `  (${fmtD(it.start)} – ${fmtD(it.end)})`:'');
-  document.getElementById("mDue").textContent = it.end ? `${it.end.getFullYear()}.${fmtMD(it.end)}` : "—";
   document.getElementById("mProg").innerHTML = `${progBar(it,false)}<span class="st ${statusOf(it).k}" style="margin-top:4px;display:inline-block">${statusOf(it).l}</span>`;
   document.getElementById("mResp").textContent = it.r || "—";
   document.getElementById("mCollab").textContent = it.c || "—";
