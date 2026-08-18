@@ -1,7 +1,7 @@
 # ТӨСЛИЙН ГАРЫН АВЛАГА БА АЖИЛЛАХ ДҮРЭМ (festival-tuluvluguu)
 
 > **ЧУХАЛ:** Шинэ чат эхлэх бүрд энэ дүрмийг уншиж, мөрдлөг болгоно. **Дараа нь заавал `AI_HISTORY.md`-ийн эхний 10-15 мөрийг уншиж, өмнөх чатуудад юу хийгдсэнийг мэдэж авна** (§7).
-> **PUSH = DEPLOY:** "push хий" гэсэн хүсэлт нь push + Netlify deploy-г хамтад нь гэсэн үг — дунд нь дахин зөвшөөрөл асуухгүй (§6).
+> **PUSH = DEPLOY:** production нь одоо **GitHub Pages** — `git push` хийхэд ~1 минутын дотор автоматаар live болно. Тусад нь deploy комманд ажиллуулах шаардлагагүй (§6).
 > **⚡ ТОКЕН ХЭМНЭХ / ХУРДАН АЖИЛЛАХ ЗААВАР:** `index.html` нэг файл ~500 мөр тул бүтнээр бүү унш — `grep` болон `Read offset/limit` ашигла. Зассан файлыг дахин уншиж токен бүү үрэ (Edit амжилттай болсон бол хангалттай). Шалгалтуудыг нэг Bash комманд (`tools/check.sh`) дотор багцалсан — тусад нь `node --check` гэх мэтийг гараар давтаж бүү бич. Хариулт маш товч, тодорхой байна.
 
 ## 1. Юу вэ (Товч танилцуулга)
@@ -19,7 +19,7 @@
 
 ## 2. Техникийн үндэс ба орчин
 - **Framework: байхгүй.** Цэвэр HTML + CSS + vanilla JS — **бүх зүйл нэг файл `index.html`-д** байрлана (inline `<style>`, inline `<script>`). Build step, npm dependency шаардлагагүй.
-- **Document root:** repo-ийн үндэс өөрөө (`public/` гэж байхгүй). Netlify `--dir=.`-ээр шууд deploy хийдэг.
+- **Document root:** repo-ийн үндэс өөрөө (`public/` гэж байхгүй). GitHub Pages `main` branch-ийн `/` замаас шууд түгээнэ.
 - **Хэл:** Бүх UI текст Монгол, шууд HTML дотор бичигдсэн (орчуулгын key/файл байхгүй).
 - **UI/Брэнд:** erp.e-mongolia.mn-тэй ижилсүүлсэн **navy blue / цагаан корпорэйт схем** — CSS variables `:root` дотор (`--accent:#1e49b6`, `--card`, `--line`, `--sand` гэх мэт), light/dark хоёулаа (`:root[data-theme]`). Фонт — системийн UI фонт (Rubik/Google Fonts аль хэдийн хасагдсан). Эх сурвалж тус бүрийн өнгө `PALETTE` массивт (одоогоор 2 элемент: #1e49b6, #0e8f74).
 
@@ -69,22 +69,18 @@ bash tools/check.sh
 (UI-г нүдээр шалгах бол: `python3 -m http.server 8080` асаагаад browser-оор шалгаж болно.)
 
 ## 6. Git ба Deploy урсгал
-- **GitHub:** https://github.com/Boldsaikhan/festival-tuluvluguu (private), үндсэн branch `main`. (Repo нэр хуучин фестивалийн агуулгаас үлдсэн — агуулга солигдсон ч нэрийг өөрчлөөгүй.)
-- **Netlify:** production https://pp-100.netlify.app (`pp` нэр аль хэдийн эзэмшигдсэн байсан тул `pp-100` болсон). Site холбоос локал `.netlify/state.json`-д хадгалагдсан (`.gitignore`-д орсон тул commit хийгдэхгүй — шинэ машин дээр `npx netlify-cli link --id 3345998a-7929-4697-b330-256d362b2cdb` хийж холбоно).
-- **🔴 2026-07-30-наас Netlify deploy БЛОКЛОГДСОН.** API нь `HTTP 403` + `{"error":"Account credit usage exceeded - new deploys are blocked until credits are added"}` буцаана. Free plan-ийн credit дууссан — **хэрэглэгч credit нэмэх/plan сайжруулах хүртэл `netlify deploy` ажиллахгүй** (`app.netlify.com/teams/ca-boogii/billing`). Нэвтрэлт, site холбоос, `state:current` бүгд хэвийн — асуудал зөвхөн billing. Deploy оролдоод 403 гарвал дахин дахин бүү оролд, хэрэглэгчид мэдэгд. Live дээр `fd5adf9` хувилбар зогссон.
-- **⚠️ GitHub → Netlify автомат холбоос ХИЙГДЭЭГҮЙ.** `git push` хийхэд Netlify өөрөө шинэчлэгдэхгүй — заавал тусад нь дараах коммандыг ажиллуул:
-  ```bash
-  npx --yes netlify-cli deploy --prod --dir=.
-  ```
-- **🔒 PUSH = DEPLOY (2026-07-29-нээс мөрдөх дүрэм).** Хэрэглэгч "push хий" гэж хүсвэл энэ нь **push + Netlify deploy-г хамтад нь** гэсэн үг. Push хийчхээд deploy хийх эсэхийг дахин **бүү асуу** — доорх дарааллыг нэг мөсөн гүйцэтгэ:
+- **GitHub:** https://github.com/Boldsaikhan/festival-tuluvluguu (**public** — 2026-08-18-нд private-ээс сольсон, GitHub Pages-ийг үнэгүй ашиглах зорилгоор), үндсэн branch `main`. (Repo нэр хуучин фестивалийн агуулгаас үлдсэн — агуулга солигдсон ч нэрийг өөрчлөөгүй.)
+- **✅ Production: GitHub Pages — https://boldsaikhan.github.io/festival-tuluvluguu/** (2026-08-18-наас). `main` branch-ийн үндсээс (`/`) шууд түгээгддэг. **`git push` хийхэд GitHub өөрөө ~1 минутын дотор дахин барьж live болгоно** — гараар deploy хийх комманд БАЙХГҮЙ. Build статусыг repo-ийн Actions таб эсвэл `/repos/:owner/:repo/pages/builds/latest` API-аас харна.
+- **🔴 Netlify (https://pp-100.netlify.app) — АШИГЛАХАА БОЛЬСОН.** 2026-07-30-наас API `403 {"error":"Account credit usage exceeded - new deploys are blocked until credits are added"}` буцааж, deploy бүрэн блоклогдсон (free plan-ийн credit дууссан). Live дээр `fd5adf9` хувилбар зогссон тул 5 коммитын өөрчлөлт хэрэглэгчид харагдахгүй байсан. **`netlify-cli deploy` бүү ажиллуул** — credit нэмэгдээгүй хэвээр. Хуучин site id: `3345998a-7929-4697-b330-256d362b2cdb`.
+
+- **🔒 PUSH = DEPLOY (2026-07-29-нээс мөрдөх дүрэм; 2026-08-18-нд Pages-д тохируулав).** Хэрэглэгч "push хий" гэж хүсвэл доорх дарааллыг нэг мөсөн гүйцэтгэ. Push өөрөө deploy тул нэмэлт алхам хэрэггүй:
   ```bash
   bash tools/check.sh                       # 1) бүгд ✅ байх ёстой
   git add <зөвхөн засварласан файлууд>       # 2) git add -A / . БҮҮ хэрэглэ
   git commit -m "…"                          # 3) монгол хэлээр
-  git push                                   # 4)
-  npx --yes netlify-cli deploy --prod --dir=. # 5) ЗААВАЛ — GitHub→Netlify автомат холбоос БАЙХГҮЙ
+  git push                                   # 4) → GitHub Pages ~1 мин дотор автоматаар live
   ```
-  Дараа нь `AI_HISTORY.md`-д commit hash + "Push, Netlify deploy хийв" гэж бөглөж, тэр мөрийг бас push хийнэ.
+  Дараа нь `AI_HISTORY.md`-д commit hash + "Push хийв (Pages автоматаар deploy)" гэж бөглөж, тэр мөрийг бас push хийнэ.
 - **Гэхдээ push-ыг өөрөө санаачлахгүй:** commit хүртэл өөрөө хийж болно, харин `git push` нь нийтэд харагдах үйлдэл тул **хэрэглэгч хүсээгүй байхад бүү эхлүүл** — зөвхөн "push хий" / "deploy хий" гэж хэлсэн үед. Хүссэн үед нь бол дээрх 5 алхмыг асуултгүй бүрэн гүйцэтгэнэ.
 
 ## 7. Харилцах хэл ба түүх хөтлөх (ЧАТ ХООРОНДЫН ОЙ САНАМЖ)

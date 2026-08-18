@@ -5,21 +5,31 @@ cd "$(dirname "$0")/.."
 FILE="index.html"
 FAIL=0
 
+# Python-ы нэр орчноос хамаарна: Linux/Mac дээр python3, Windows (Git Bash) дээр
+# ихэвчлэн python. `python3` нь Microsoft Store-ын хоосон stub байж болзошгүй тул
+# үнэхээр ажиллаж байгааг шалгаж сонгоно.
+if python3 -c "" >/dev/null 2>&1; then PY=python3
+elif python -c "" >/dev/null 2>&1; then PY=python
+else echo "FAIL: python олдсонгүй"; exit 1; fi
+
 echo "== 1) <script> JS syntax =="
-python3 - "$FILE" <<'PY'
+"$PY" - "$FILE" <<'PY'
 import re,sys
 html = open(sys.argv[1], encoding="utf-8").read()
 m = re.search(r"<script>(.*)</script>", html, re.S)
-open("/tmp/_festival_check.js","w",encoding="utf-8").write(m.group(1))
+open("tools/_check_tmp.js","w",encoding="utf-8").write(m.group(1))
 PY
-if node --check /tmp/_festival_check.js 2>&1; then
+# Түр файлыг repo-д харьцангуй замаар бичнэ — Git Bash-ийн /tmp нь Windows-ын
+# node/python хоёрт өөр зам болж хөрвөдөг тул үнэмлэхүй зам ашиглахгүй.
+if node --check tools/_check_tmp.js 2>&1; then
   echo "OK: JS syntax зөв"
 else
   echo "FAIL: JS syntax алдаатай"; FAIL=1
 fi
+rm -f tools/_check_tmp.js
 
 echo "== 2) <style> CSS хаалтын тэнцвэр =="
-if python3 - "$FILE" <<'PY'
+if "$PY" - "$FILE" <<'PY'
 import re,sys
 html = open(sys.argv[1], encoding="utf-8").read()
 style = re.search(r"<style>(.*)</style>", html, re.S).group(1)
