@@ -28,7 +28,13 @@ GitHub Actions-ийн runner нь АНУ/Европт байрладаг. **НД
 
 ## 2. Серверийн тохиргоо (нэг удаа)
 
-SSH-ээр серверт нэвтэрсний дараа root эрхээр:
+**Хамгийн хялбар зам** — консол дээр ганц мөр (бүх алхмыг хийнэ, дахин ажиллуулахад аюулгүй):
+
+```bash
+sudo bash -c "$(curl -fsSL https://raw.githubusercontent.com/Boldsaikhan/festival-tuluvluguu/main/scripts/server-setup.sh)"
+```
+
+Гараар хийх бол (эсвэл юу болж байгааг харах бол) доорх алхмуудыг root эрхээр:
 
 ```bash
 # 2.1 Шаардлагатай багц
