@@ -70,6 +70,7 @@ bash tools/check.sh
 
 ## 6. Git ба Deploy урсгал
 - **GitHub:** https://github.com/Boldsaikhan/festival-tuluvluguu (**public** — 2026-08-18-нд private-ээс сольсон, GitHub Pages-ийг үнэгүй ашиглах зорилгоор), үндсэн branch `main`. (Repo нэр хуучин фестивалийн агуулгаас үлдсэн — агуулга солигдсон ч нэрийг өөрчлөөгүй.)
+- **✅ Production №2: mcloud сервер (`manage-dornogovi`, Ubuntu)** — push хийхэд серверийн cron 2 минут тутам `git fetch` хийж, шинэ commit байвал `deploy.sh`-ээр `/var/www/uureg-biyelelt` рүү нийтэлнэ (**pull-based**: НДТ-ийн firewall гаднаас ирэх SSH-г хаадаг тул GitHub Actions-ийн push deploy найдваргүй). Бүрэн заавар: `DEPLOY.md`. Гараар шалгах: `/opt/festival-tuluvluguu/scripts/auto-deploy.sh --force`.
 - **✅ Production: GitHub Pages — https://boldsaikhan.github.io/festival-tuluvluguu/** (2026-08-18-наас). `main` branch-ийн үндсээс (`/`) шууд түгээгддэг. **`git push` хийхэд GitHub өөрөө ~1 минутын дотор дахин барьж live болгоно** — гараар deploy хийх комманд БАЙХГҮЙ. Build статусыг repo-ийн Actions таб эсвэл `/repos/:owner/:repo/pages/builds/latest` API-аас харна.
 - **🔴 Netlify (https://pp-100.netlify.app) — АШИГЛАХАА БОЛЬСОН.** 2026-07-30-наас API `403 {"error":"Account credit usage exceeded - new deploys are blocked until credits are added"}` буцааж, deploy бүрэн блоклогдсон (free plan-ийн credit дууссан). Live дээр `fd5adf9` хувилбар зогссон тул 5 коммитын өөрчлөлт хэрэглэгчид харагдахгүй байсан. **`netlify-cli deploy` бүү ажиллуул** — credit нэмэгдээгүй хэвээр. Хуучин site id: `3345998a-7929-4697-b330-256d362b2cdb`.
 

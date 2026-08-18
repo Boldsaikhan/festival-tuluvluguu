@@ -1,0 +1,61 @@
+name: Deploy (mcloud)
+
+# ⚠️ Push дээр АЖИЛЛАХГҮЙ — зөвхөн гараар (Actions таб -> Run workflow).
+# Шалтгаан: НДТөвийн firewall гаднаас ирэх SSH-г хаадаг тул GitHub-ийн runner
+# серверт хүрэхгүй. Үндсэн deploy нь серверийн cron дээрх pull-based
+# scripts/auto-deploy.sh (DEPLOY.md §2). Энэ workflow нь firewall нээгдсэн
+# тохиолдолд ашиглах нөөц зам.
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Шаардлагатай secret-үүдийг шалгах
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_PORT: ${{ secrets.SSH_PORT }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          missing=""
+          for name in SSH_HOST SSH_USER SSH_PORT SSH_PRIVATE_KEY; do
+            [ -z "${!name}" ] && missing="$missing $name"
+          done
+          if [ -n "$missing" ]; then
+            echo "::error::Repository secret дутуу:$missing"
+            echo "Settings -> Secrets and variables -> Actions дотор нэмнэ."
+            exit 1
+          fi
+          echo "4 secret бүрэн байна."
+
+      - name: Сервер хүрэх эсэхийг шалгах
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_PORT: ${{ secrets.SSH_PORT }}
+        run: |
+          if timeout 15 bash -c "cat < /dev/null > /dev/tcp/$SSH_HOST/$SSH_PORT" 2>/dev/null; then
+            echo "$SSH_HOST:$SSH_PORT рүү энэ runner-ээс хүрч байна."
+          else
+            echo "::error::$SSH_HOST:$SSH_PORT рүү GitHub-ийн runner-ээс хүрэхгүй байна."
+            echo "НДТ-ийн firewall гаднаас ирэх урсгалыг хаасан байна."
+            echo "Шийдэл: серверийн cron дээрх scripts/auto-deploy.sh (pull-based) ашиглана."
+            exit 1
+          fi
+
+      - name: SSH-ээр deploy хийх
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          command_timeout: 5m
+          script: |
+            /opt/festival-tuluvluguu/deploy.sh
