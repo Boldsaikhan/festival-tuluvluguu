@@ -221,6 +221,11 @@ td.edit:empty::before{content:"—"; color:#aeb6c6}
   border:1px solid transparent; border-radius:4px; background:transparent; color:var(--ink); padding:1px 2px}
 .prog-num:hover{border-color:var(--accent-2)}
 .prog-num:focus{outline:none; border-color:var(--accent); background:var(--card)}
+/* Хэлтсийн зураглалын оролт (хариуцагч → хэлтэс) */
+.dept-in{width:100%; min-width:150px; font-size:12px; padding:3px 6px; color:var(--ink);
+  border:1px solid var(--line); border-radius:4px; background:transparent}
+.dept-in:hover{border-color:var(--accent-2)}
+.dept-in:focus{outline:none; border-color:var(--accent); background:var(--card)}
 .st{display:inline-block; padding:1px 7px; border-radius:20px; font-size:10.5px; font-weight:600; white-space:nowrap}
 .st.none{background:var(--sand-2); color:var(--ink-soft)}
 .st.doing{background:#e6efff; color:#1e49b6}
@@ -346,12 +351,17 @@ a{color:var(--accent)}
     <div class="viewtoggle">
       <button data-view="wk">📈 График</button>
       <button data-view="list" class="active">📋 Жагсаалт</button>
+      <button data-view="dept">🏢 Хэлтэс</button>
       <button data-view="cal">📅 Хуанли</button>
       <button data-view="tl">📊 Хугацааны шугам</button>
       <button data-view="imp">🗓️ Хэрэгжилт</button>
     </div>
     <span class="result-count" id="resultCount"></span>
   </div>
+
+  <section class="view" id="view-dept">
+    <div id="deptBody"></div>
+  </section>
 
   <section class="view" id="view-cal">
     <div class="cal-months" id="calMonths"></div>
@@ -443,6 +453,49 @@ function respList(item){ return String(item.r||"").split(",").map(x=>x.trim()).f
 // Салбар — өвөлжилтийн бэлтгэлийн төлөвлөгөөнд (sec=2) `sal` талбараар шууд заагдсан.
 // 07.09-ны үүрэг, чиглэлд салбар дурдагдаагүй тул "Тодорхойгүй" бүлэгт орно.
 function salList(item){ return [String(item.sal||"").trim() || UNKNOWN]; }
+
+// ---------- Хэлтсийн зураглал (хариуцагч → хэлтэс) ----------
+// Эх баримт бичигт хэлтсийн нэр байдаггүй тул хариуцагч бүрийг ямар хэлтэст
+// хамаарахыг хэрэглэгч өөрөө онооно (браузерын localStorage-д хадгална).
+const DEPT_KEY = "uch_depts_v1";
+const NO_DEPT = "Хэлтэс оноогоогүй";
+let DEPTMAP = {};
+try{ DEPTMAP = JSON.parse(localStorage.getItem(DEPT_KEY) || "{}") || {}; }catch(e){ DEPTMAP = {}; }
+function saveDeptMap(){ try{ localStorage.setItem(DEPT_KEY, JSON.stringify(DEPTMAP)); }catch(e){} }
+
+// Хариуцагч нь хүний нэр биш, байгууллага/хэлтэс өөрөө бол түүнийг шууд бүлэг
+// болгож ашиглана (жишээ нь "Татварын хэлтэс", "Мал эмнэлгийн газар", "… ХХК").
+// Үгийн ТӨГСГӨЛӨӨР шалгана — "Ц.Сансармаа" мэтийн хүний нэр дотор санамсаргүй
+// таарахаас сэргийлнэ ("ХХААГазар" → газар ✓, "…ОНӨХХК" → ххк ✓).
+const ORG_WORDS = ["хэлтэс","газар","ххк","хк","здтг","хороо","нэгтгэл","алба","төв","сургууль","эмнэлэг"];
+function autoDept(resp){
+  const toks = String(resp||"").toLowerCase().replace(/["'«»()]/g," ").split(/[\s,]+/).filter(Boolean);
+  return toks.some(t=> ORG_WORDS.some(w=> t.endsWith(w))) ? String(resp).trim() : "";
+}
+function deptOfResp(resp){
+  const key = String(resp||"").trim();
+  if(!key) return "";
+  const manual = String(DEPTMAP[key]||"").trim();
+  return manual || autoDept(key);
+}
+// Ажлын хэлтэс — үндсэн (эхний) хариуцагчаар тодорхойлно, ингэснээр нэг ажил
+// хоёр хэлтэст давхар тоологдохгүй.
+function deptOf(item){ return deptOfResp(respList(item)[0] || "") || NO_DEPT; }
+// Зураглалд оруулах шаардлагатай хариуцагчид (давхардалгүй, ажлын тоогоор)
+function respOwners(){
+  const map = new Map();
+  DATA.forEach(it=>{
+    const owner = respList(it)[0] || "";
+    if(!owner) return;
+    map.set(owner, (map.get(owner)||0)+1);
+  });
+  return [...map.entries()].sort((a,b)=> b[1]-a[1] || a[0].localeCompare(b[0],"mn"));
+}
+function knownDepts(){
+  const set = new Set();
+  DATA.forEach(it=>{ const d = deptOf(it); if(d!==NO_DEPT) set.add(d); });
+  return [...set].sort((a,b)=> a.localeCompare(b,"mn"));
+}
 
 // ---- бүх үүрэг, чиглэлийн өгөгдөл (id, эх сурвалж, чиглэлийн текст, огноо, хариуцагч, хяналт тавигч, тайлбар)
 const RAW = [
@@ -691,25 +744,30 @@ let currentFilter = {q:"", sec:""};
 let doneOnly = false;     // "Хэрэгжсэн" (100%) төлөв идэвхтэй эсэх
 let salFilter = "";      // сонгосон салбар
 let respFilter = "";      // сонгосон хариуцагч
+let deptFilter = "";      // сонгосон хэлтэс
 let openGroup = null;     // null | 'sal' | 'resp' — дэд шүүлтүүрийн мөр нээлттэй эсэх
 let selectedDay = null;
 
 // тодорхой эцсийн хугацаатай (эхлэх ≠ дуусах) үүрэг, чиглэл
 function hasDue(it){ return !!(it.start && it.end && it.start.getTime()!==it.end.getTime()); }
 
-function matchesBase(item, useSal){
+function matchesBase(item, useSal, useDept){
   const q = currentFilter.q.trim().toLowerCase();
   if(currentFilter.sec && String(item.sec)!==currentFilter.sec) return false;
   if(doneOnly && item.prog < 100) return false;
   if(useSal && salFilter && !salList(item).includes(salFilter)) return false;
   if(respFilter && !(respFilter===UNKNOWN ? respList(item).length===0 : respList(item).includes(respFilter))) return false;
+  if(useDept!==false && deptFilter && deptOf(item)!==deptFilter) return false;
   if(!q) return true;
   return (item.t+" "+item.r+" "+item.c+" "+item.n+" "+sectionName(item.sec)).toLowerCase().includes(q);
 }
-function matches(item){ return matchesBase(item, true); }
+function matches(item){ return matchesBase(item, true, true); }
+// Хэлтсийн шүүлтүүрийг тооцохгүй — хэлтсийн панелиуд сонголт хийсний дараа ч
+// бүгд харагдаж, өөр хэлтэс рүү шууд сэлгэх боломжтой байхын тулд
+function matchesNoDept(item){ return matchesBase(item, true, false); }
 // Салбарын шүүлтүүрийг тооцохгүй — салбарын панелиуд сонголт хийсний дараа ч
 // бүгд харагдаж, өөр салбар рүү шууд сэлгэх боломжтой байхын тулд
-function matchesNoSal(item){ return matchesBase(item, false); }
+function matchesNoSal(item){ return matchesBase(item, false, true); }
 
 // ---------- stats (ERP-style folder cards, click to filter) ----------
 // Бүлэг бүрийн (хэлтэс / хариуцагч) утга → тухайн утгад хамаарах ажлын тоо
@@ -1193,6 +1251,144 @@ function openModal(id){
 document.getElementById("mClose").addEventListener("click", ()=> document.getElementById("modalBack").classList.remove("open"));
 document.getElementById("modalBack").addEventListener("click", e=>{ if(e.target.id==="modalBack") e.currentTarget.classList.remove("open"); });
 
+// ---------- Хэлтэс харагдац ----------
+// Хэлтэс тус бүрийн хэрэгжилт + хариуцагчийг хэлтэст хуваарилах зураглал.
+function renderDept(){
+  const el = document.getElementById("deptBody");
+
+  // Хэлтсийн панелиуд хэлтсийн шүүлтүүрээс хамаарахгүй (сонгосны дараа ч бүгд харагдана)
+  const groups = new Map();
+  DATA.filter(matchesNoDept).forEach(it=>{
+    const k = deptOf(it); (groups.get(k) || groups.set(k,[]).get(k)).push(it);
+  });
+  const order = [...groups.keys()].sort((a,b)=>{
+    if(a===NO_DEPT) return 1;
+    if(b===NO_DEPT) return -1;
+    return groups.get(b).length - groups.get(a).length || a.localeCompare(b,"mn");
+  });
+  const deptRows = order.map(d=>{
+    const list = groups.get(d);
+    return {name:`${truncate(d, 34)} (${list.length})`, dept:d,
+            v: Math.round(list.reduce((a,x)=>a+x.prog,0)/list.length),
+            sub:`${list.length} ажил`};
+  });
+
+  const items = DATA.filter(matches);
+  const avg = items.length ? Math.round(items.reduce((a,d)=>a+d.prog,0)/items.length) : 0;
+  const done = items.filter(d=>d.prog>=100).length;
+  const owners = respOwners();
+  const mapped = owners.filter(([o])=> deptOfResp(o)).length;
+  const depts = order.filter(d=> d!==NO_DEPT);
+
+  el.innerHTML = `
+    <div class="chartbox">
+      <div class="chart-head">
+        <span class="chart-title">${deptFilter ? escapeHtml(deptFilter) : "Бүх хэлтэс"}</span>
+        <span class="chart-sub">${depts.length} хэлтэс · ${items.length} ажил · ${done} хэрэгжсэн</span>
+        ${deptFilter ? `<button class="mini-btn" id="deptClear">✕ шүүлтүүр цуцлах</button>` : ''}
+        <span class="hero-num">${avg}%</span>
+      </div>
+      <div class="prog-bar big"><div class="prog-fill ${avg>=100?'done':''}" style="width:${avg}%"></div></div>
+    </div>
+
+    <div class="chartbox">
+      <div class="chart-head">
+        <span class="chart-title">Хэлтэс тус бүрийн хэрэгжилт</span>
+        <span class="chart-sub">хэлтсийн дундаж хувь · <b>хэлтэс дээр дарж</b> тухайн хэлтсийн ажлыг шүүнэ</span>
+      </div>
+      ${deptRows.length
+        ? barChart(deptRows, {w:760})
+        : `<div class="ch-empty">Ажил алга.</div>`}
+    </div>
+
+    <div class="chartbox">
+      <div class="chart-head">
+        <span class="chart-title">${deptFilter ? escapeHtml(deptFilter)+" — ажлууд" : "Ажлууд"}</span>
+        <span class="chart-sub">${items.length} ажил</span>
+      </div>
+      <div class="list-table-wrap">
+        <table class="list">
+          <thead><tr>
+            <th>№</th><th>Хэлтэс</th><th class="act-cell">Үүрэг, чиглэл / Ажил</th>
+            <th>Үндсэн хэрэгжүүлэгч</th><th class="prog-cell">Хэрэгжилт</th>
+          </tr></thead>
+          <tbody>
+            ${items.length ? items.map(it=>`<tr>
+              <td>${it.no}</td>
+              <td>${escapeHtml(deptOf(it))}</td>
+              <td class="act-cell">${escapeHtml(it.t)}</td>
+              <td>${escapeHtml(it.r) || "—"}</td>
+              <td class="prog-cell">${progBar(it, false)}</td>
+            </tr>`).join("")
+            : `<tr><td colspan="5" class="ch-empty">Шүүлтүүрт тохирох ажил алга.</td></tr>`}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="chartbox">
+      <div class="chart-head">
+        <span class="chart-title">Хариуцагчийн хэлтсийн зураглал</span>
+        <span class="chart-sub">${mapped} / ${owners.length} хариуцагч оноогдсон · хэлтсийн нэрийг бичихэд шууд хадгална</span>
+        <button class="mini-btn" id="deptMapReset">↺ Зураглалыг цэвэрлэх</button>
+      </div>
+      <div class="list-table-wrap">
+        <table class="list">
+          <thead><tr><th>Үндсэн хэрэгжүүлэгч</th><th>Ажлын тоо</th><th>Хэлтэс</th></tr></thead>
+          <tbody>
+            ${owners.map(([owner, cnt])=>{
+              const cur = String(DEPTMAP[owner]||"").trim();
+              const auto = !cur && autoDept(owner);
+              return `<tr>
+                <td>${escapeHtml(owner)}</td>
+                <td>${cnt}</td>
+                <td><input class="dept-in" list="deptOptions" data-owner="${escapeAttr(owner)}"
+                     value="${escapeAttr(cur)}" placeholder="${auto ? escapeAttr(auto)+" (автоматаар)" : "хэлтсийн нэр…"}"></td>
+              </tr>`;
+            }).join("")}
+          </tbody>
+        </table>
+      </div>
+      <datalist id="deptOptions">${depts.map(d=>`<option value="${escapeAttr(d)}">`).join("")}</datalist>
+      <div style="margin-top:10px; font-size:12px; color:var(--ink-soft)">
+        ℹ️ Эх баримт бичигт хэлтсийн нэр байдаггүй тул хариуцагч бүрийг ямар хэлтэст хамаарахыг энд оноож өгнө.
+        Байгууллага/хэлтсийн нэр бүхий хариуцагч (жишээ нь "Татварын хэлтэс", "Мал эмнэлгийн газар", "… ХХК")
+        автоматаар өөрийнхөө нэрээр бүлэглэгдэнэ. Зураглал таны браузерт (localStorage) хадгалагдана.
+      </div>
+    </div>`;
+
+  const pick = d =>{
+    deptFilter = (deptFilter===d) ? "" : d;
+    renderStats(); renderSubStats(); renderAll();
+  };
+  const bars = el.querySelectorAll(".chartbox")[1].querySelectorAll("rect.hit");
+  bars.forEach((r,i)=>{ r.style.cursor = "pointer"; r.addEventListener("click", ()=> pick(deptRows[i].dept)); });
+  const clr = document.getElementById("deptClear");
+  if(clr) clr.addEventListener("click", ()=> pick(deptFilter));
+
+  el.querySelectorAll("input.dept-in").forEach(inp=>{
+    const commit = ()=>{
+      const owner = inp.dataset.owner, val = inp.value.trim();
+      if(val) DEPTMAP[owner] = val; else delete DEPTMAP[owner];
+      saveDeptMap();
+      if(deptFilter && !knownDepts().includes(deptFilter)) deptFilter = "";
+      renderDept();
+    };
+    inp.addEventListener("change", commit);
+    inp.addEventListener("keydown", e=>{ if(e.key==="Enter"){ e.preventDefault(); inp.blur(); } });
+  });
+
+  const reset = document.getElementById("deptMapReset");
+  if(reset) reset.addEventListener("click", ()=>{
+    if(!Object.keys(DEPTMAP).length){ alert("Зураглал хоосон байна."); return; }
+    if(confirm("Хариуцагч бүрт оноосон хэлтсийн нэр устана. Үргэлжлүүлэх үү?")){
+      DEPTMAP = {}; saveDeptMap(); deptFilter = ""; renderStats(); renderSubStats(); renderAll();
+    }
+  });
+
+  wireChartTips(el);
+}
+
 // ---------- helpers ----------
 function escapeHtml(s){ return String(s??"").replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
 function escapeAttr(s){ return escapeHtml(s); }
@@ -1214,6 +1410,7 @@ function renderAll(){
   if(activeView==="cal"){ renderCalendar(); if(selectedDay) showDayDetail(selectedDay); }
   if(activeView==="tl") renderTimeline();
   if(activeView==="list") renderList();
+  if(activeView==="dept") renderDept();
   if(activeView==="imp") renderImplementation();
   if(activeView==="wk") renderWeekly();
 }
